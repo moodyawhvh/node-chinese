@@ -1,38 +1,36 @@
-# How to write documentation for the Node.js project
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
 
-This document refers to the Node.js API documentation that gets deployed to [nodejs.org/en/docs][]
-and consists in a general reference on how to write and update such documentation.
+# 如何为 Node.js 项目编写文档
 
-## Style Guide
+本文档针对部署到 [nodejs.org/en/docs][] 的 Node.js API 文档,是关于如何编写和更新这类文档的通用参考。
 
-For a style guide on how to write or update the Node.js documentation refer to the [doc/README][] document.
+## 风格指南
 
-## Building
+有关如何编写或更新 Node.js 文档的风格指南,请参阅 [doc/README][] 文档。
 
-There are a few different commands that you can use to build and view the documentation locally,
-the simplest one being:
+## 构建
+
+有若干命令可用于在本地构建和查看文档,最简单的一个是:
 
 ```bash
 make docserve
 ```
 
-This command builds the documentation, spins up a local server and provides you with a URL to
-it that you can navigate to in order to view the built documentation.
+该命令会构建文档、启动一个本地服务器,并给你一个 URL,在浏览器中打开即可查看构建好的文档。
 
-For more build options refer to the [documentation building][building-the-documentation] documentation.
+更多构建选项请参阅[文档构建][building-the-documentation]文档。
 
-And for more details about the tooling used to build the documentation refer to
-the [API Documentation Tooling][] document.
+关于构建文档所用工具链的更多细节,请参阅 [API 文档工具链][]文档。
 
-## Linting and Formatting
+## Lint 与格式化
 
-To make sure that your changes pass linting run the following command:
+要确保你的改动通过 lint 检查,请运行以下命令:
 
 ```bash
 make lint-md
 ```
 
-[API Documentation Tooling]: ./api-documentation.md
+[API 文档工具链]: ./api-documentation.md
 [building-the-documentation]: ../../BUILDING.md#building-the-documentation
 [doc/README]: ../../doc/README.md
 [nodejs.org/en/docs]: https://nodejs.org/en/docs/

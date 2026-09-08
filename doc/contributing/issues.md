@@ -1,76 +1,46 @@
-# Issues
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
 
-* [Asking for general help](#asking-for-general-help)
-* [Discussing non-technical topics](#discussing-non-technical-topics)
-* [Submitting a bug report](#submitting-a-bug-report)
-* [Triaging a bug report](#triaging-a-bug-report)
+# Issue
 
-## Asking for general help
+* [寻求一般性帮助](#寻求一般性帮助)
+* [讨论非技术话题](#讨论非技术话题)
+* [提交缺陷报告](#提交缺陷报告)
+* [分诊缺陷报告](#分诊缺陷报告)
 
-Because the level of activity in the `nodejs/node` repository is so high,
-questions or requests for general help using Node.js should be directed at
-the [Node.js help repository][].
+## 寻求一般性帮助
 
-## Discussing non-technical topics
+由于 `nodejs/node` 仓库的活跃度非常高,关于使用 Node.js 的问题或一般性求助请求,请前往 [Node.js help 仓库][]提出。
 
-Discussion of non-technical topics (such as intellectual property and trademark)
-should be directed to the [Technical Steering Committee (TSC) repository][].
+## 讨论非技术话题
 
-## Submitting a bug report
+非技术话题(如知识产权与商标)的讨论,请提交到[技术指导委员会(TSC)仓库][]。
 
-When opening a new issue in the `nodejs/node` issue tracker, users will be
-presented with a choice of issue templates. If you believe that you have
-uncovered a bug in Node.js, please fill out the `Bug Report` template to the
-best of your ability. Do not worry if you cannot answer every detail; just fill
-in what you can.
+## 提交缺陷报告
 
-The two most important pieces of information we need in order to properly
-evaluate the report is a description of the behavior you are seeing and a simple
-test case we can use to recreate the problem on our own. If we cannot recreate
-the issue, it becomes impossible for us to fix.
+在 `nodejs/node` 的 issue 跟踪系统中新建 issue 时,用户会看到一组 issue 模板供选择。如果你认为自己发现了 Node.js 的一个缺陷,请尽可能完整地填写 `Bug Report` 模板。答不上每个细节也不要紧,能填多少填多少即可。
 
-In order to rule out the possibility of bugs introduced by userland code, test
-cases should be limited, as much as possible, to using _only_ Node.js APIs.
-If the bug occurs only when you're using a specific userland module, there is
-a very good chance that either (a) the module has a bug or (b) something in
-Node.js changed that broke the module.
+为了正确评估报告,我们最需要两条信息:一是你所观察到的行为的描述,二是一个可供我们在本地复现问题的简单测试用例。如果无法复现问题,我们就无从修复。
 
-See [How to create a Minimal, Complete, and Verifiable example](https://stackoverflow.com/help/mcve).
+为了排除用户态代码引入缺陷的可能性,测试用例应尽量做到_只_使用 Node.js API。如果缺陷只在使用某个特定用户态模块时出现,那么很可能要么 (a) 该模块本身有缺陷,要么 (b) Node.js 的某些变动导致该模块失效。
 
-## Triaging a bug report
+参见[如何创建最小、完整、可验证的示例](https://stackoverflow.com/help/mcve)。
 
-Once an issue has been opened, it is common for there to be discussion
-around it. Some contributors may have differing opinions about the issue,
-including whether the behavior being seen is a bug or a feature. This discussion
-is part of the process and should be kept focused, helpful, and professional.
+## 分诊缺陷报告
 
-The objective of helping with triaging issues (in core and help repos) is to
-help reduce the issue backlog and keep the issue tracker healthy, while enabling
-newcomers another meaningful way to get engaged and contribute.
+issue 提交后,围绕它展开讨论是很常见的。有些贡献者可能对 issue 持不同看法,包括观察到的行为究竟算是缺陷还是特性。这种讨论是流程的一部分,应当保持聚焦、有益且专业。
 
-Anyone with a reasonable understanding of Node.js programming and the
-project's GitHub organization plus a few contributions to the project
-(commenting on issues or PRs) can apply for and become a triager. Open a PR
-on the README.md of this project with: i) a request to be added as a triager,
-ii) the motivation for becoming a triager, and iii) agreement on reading,
-understanding, and adhering to the project's [Code Of Conduct](https://github.com/nodejs/admin/blob/HEAD/CODE_OF_CONDUCT.md).
+协助分诊 issue(在 core 与 help 仓库中)的目标是减少 issue 积压、保持 issue 跟踪系统的健康,同时为新成员提供另一条有意义的参与和贡献途径。
 
-The triage role enables the ability to carry out the most common triage
-activities, such as applying labels and closing/reopening/assigning issues.
-For more information on the roles and permissions, see ["Permission levels for
-repositories owned by an organization"](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization).
+任何对 Node.js 编程和本项目的 GitHub 组织有合理了解、并为项目做过若干贡献(在 issue 或 PR 下评论)的人,都可以申请成为 triager。在本项目的 README.md 上发起一个 PR,内容包括:i) 申请被添加为 triager 的请求,ii) 想成为 triager 的动机,iii) 承诺阅读、理解并遵守项目的[行为准则](https://github.com/nodejs/admin/blob/HEAD/CODE_OF_CONDUCT.md)。
 
-When triaging issues and PRs:
+triager 角色可以执行最常见的分诊操作,例如打标签、关闭/重开/指派 issue。有关角色与权限的更多信息,参见["组织所拥有的仓库的权限级别"](https://docs.github.com/en/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization)。
 
-* Show patience and empathy, especially to first-time contributors.
-* Show no patience towards spam or troll, close the issue without interacting with it and
-  report the user to the moderation repository.
-* If you're not able to reproduce an issue, leave a comment asking for more info and
-  add the `needs more info` label.
-* Ideally issues should be closed only when they have been fixed or answered (and
-  merged for pull requests). Closing an issue (or PR) earlier can be seen as
-  dismissive from the point of view of the reporter/author.
-  Always try to communicate the reason for closing the issue/PR.
+在分诊 issue 和 PR 时:
 
-[Node.js help repository]: https://github.com/nodejs/help/issues
-[Technical Steering Committee (TSC) repository]: https://github.com/nodejs/TSC/issues
+* 保持耐心与同理心,尤其是对第一次参与贡献的人。
+* 对垃圾信息或恶意捣乱零容忍:不与其互动,直接关闭 issue,并将该用户举报到内容治理仓库。
+* 如果无法复现某个 issue,请留言索要更多信息,并打上 `needs more info` 标签。
+* 理想情况下,issue 只应在已修复或已解答(对 PR 而言是已合并)后关闭。过早关闭 issue(或 PR)在报告者/作者看来可能显得敷衍。关闭 issue/PR 时请务必说明原因。
+
+[Node.js help 仓库]: https://github.com/nodejs/help/issues
+[技术指导委员会(TSC)仓库]: https://github.com/nodejs/TSC/issues
