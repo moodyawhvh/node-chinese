@@ -1,363 +1,90 @@
-# Building Node.js
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
+>
+> ⚠️ 说明:本文件篇幅超过 10000 字符,此处仅翻译核心章节(支持平台、构建前提、Unix/macOS 与 Windows 构建流程、运行测试、Intl 支持概览)。ASan 构建、Nix 集成、FIPS、Temporal、外部核心模块、发行版注意事项等其余章节请参阅[英文原版](https://github.com/nodejs/node/blob/HEAD/BUILDING.md)。
 
-Depending on what platform or features you need, the build process may
-differ. After you've built a binary, running the
-test suite to confirm that the binary works as intended is a good next step.
+# 构建 Node.js
 
-If you can reproduce a test failure, search for it in the
-[Node.js issue tracker](https://github.com/nodejs/node/issues) or
-file a new issue.
+根据所需平台和特性的不同,构建流程可能有差异。构建出二进制后,下一步建议运行测试套件,确认二进制按预期工作。
 
-## Table of contents
+如果你能复现某个测试失败,请先在 [Node.js issue 跟踪器](https://github.com/nodejs/node/issues)搜索,再决定是否提交新 issue。
 
-* [Supported platforms](#supported-platforms)
-  * [Input](#input)
-  * [Strategy](#strategy)
-  * [Platform list](#platform-list)
-  * [Supported toolchains](#supported-toolchains)
-  * [Official binary platforms and toolchains](#official-binary-platforms-and-toolchains)
-    * [OpenSSL asm support](#openssl-asm-support)
-  * [Previous versions of this document](#previous-versions-of-this-document)
-* [Building Node.js on supported platforms](#building-nodejs-on-supported-platforms)
-  * [Prerequisites](#prerequisites)
-  * [Unix and macOS](#unix-and-macos)
-    * [Unix prerequisites](#unix-prerequisites)
-    * [macOS prerequisites](#macos-prerequisites)
-    * [Building Node.js](#building-nodejs-1)
-    * [Installing Node.js](#installing-nodejs)
-    * [Running Tests](#running-tests)
-    * [Running Coverage](#running-coverage)
-    * [Building the documentation](#building-the-documentation)
-    * [Building a debug build](#building-a-debug-build)
-    * [Building an ASan build](#building-an-asan-build)
-    * [Speeding up frequent rebuilds when developing](#speeding-up-frequent-rebuilds-when-developing)
-      * [ccache](#ccache)
-      * [Loading JS files from disk instead of embedding](#loading-js-files-from-disk-instead-of-embedding)
-    * [Troubleshooting Unix and macOS builds](#troubleshooting-unix-and-macos-builds)
-  * [Windows](#windows)
-    * [Windows Prerequisites](#windows-prerequisites)
-      * [Option 1: Manual install](#option-1-manual-install)
-      * [Option 2: Automated install with WinGet](#option-2-automated-install-with-winget)
-    * [Building Node.js](#building-nodejs-2)
-      * [Using ccache](#using-ccache)
-  * [Android](#android)
-* [`Intl` (ECMA-402) support](#intl-ecma-402-support)
-  * [Build with full ICU support (all locales supported by ICU)](#build-with-full-icu-support-all-locales-supported-by-icu)
-    * [Unix/macOS](#unixmacos)
-    * [Windows](#windows-1)
-  * [Trimmed: `small-icu` (English only) support](#trimmed-small-icu-english-only-support)
-    * [Unix/macOS](#unixmacos-1)
-    * [Windows](#windows-2)
-  * [Building without Intl support](#building-without-intl-support)
-    * [Unix/macOS](#unixmacos-2)
-    * [Windows](#windows-3)
-  * [Use existing installed ICU (Unix/macOS only)](#use-existing-installed-icu-unixmacos-only)
-  * [Build with a specific ICU](#build-with-a-specific-icu)
-    * [Unix/macOS](#unixmacos-3)
-    * [Windows](#windows-4)
-* [Configuring OpenSSL config appname](#configure-openssl-appname)
-* [Building Node.js with FIPS-compliant OpenSSL](#building-nodejs-with-fips-compliant-openssl)
-* [Building Node.js with Temporal support](#building-nodejs-with-temporal-support)
-* [Building Node.js with external core modules](#building-nodejs-with-external-core-modules)
-  * [Unix/macOS](#unixmacos-4)
-  * [Windows](#windows-5)
-* [Note for downstream distributors of Node.js](#note-for-downstream-distributors-of-nodejs)
+## 支持平台
 
-## Supported platforms
+### 策略
 
-This list of supported platforms is current as of the branch/release to
-which it belongs.
+支持分三个层级:
 
-### Input
+* **Tier 1**:代表 Node.js 用户的主体。Node.js 构建工作组维护完整的测试覆盖基础设施。Tier 1 平台上的测试失败会阻塞发布。
+* **Tier 2**:代表较小规模的用户群体。同样维护完整测试覆盖,测试失败同样阻塞发布;基础设施问题可能延迟这些平台二进制的发布。
+* **Experimental**:可能无法编译或测试套件无法通过。核心团队不为这些平台产出发布版,测试失败不阻塞发布。欢迎改进这些平台支持的贡献。
 
-Node.js relies on V8 and libuv. We adopt a subset of their supported platforms.
+**生产应用请只在受支持平台(Tier 1 或 2)上运行 Node.js。**
 
-### Strategy
+厂商已停止支持的平台版本,Node.js 同样不支持,即不支持已到生命周期终点(EoL)的平台。
 
-There are three support tiers:
+平台支持概览(完整表格见英文原版):
 
-* **Tier 1**: These platforms represent the majority of Node.js users. The
-  Node.js Build Working Group maintains infrastructure for full test coverage.
-  Test failures on tier 1 platforms will block releases.
-* **Tier 2**: These platforms represent smaller segments of the Node.js user
-  base. The Node.js Build Working Group maintains infrastructure for full test
-  coverage. Test failures on tier 2 platforms will block releases.
-  Infrastructure issues may delay the release of binaries for these platforms.
-* **Experimental**: May not compile or test suite may not pass. The core team
-  does not create releases for these platforms. Test failures on experimental
-  platforms do not block releases. Contributions to improve support for these
-  platforms are welcome.
+| 操作系统   | 架构             | 版本要求                          | 支持层级     | 备注                                  |
+| ---------- | ---------------- | --------------------------------- | ------------ | ------------------------------------- |
+| GNU/Linux  | x64              | kernel >= 4.18, glibc >= 2.28     | Tier 1       | 如 Ubuntu 20.04、Debian 10、RHEL 8    |
+| GNU/Linux  | x64              | kernel >= 3.10, musl >= 1.1.19    | Experimental | 如 Alpine 3.8                         |
+| GNU/Linux  | arm64            | kernel >= 4.18, glibc >= 2.28     | Tier 1       | 如 Ubuntu 20.04、Debian 10、RHEL 8    |
+| GNU/Linux  | ppc64le >=power9 | kernel >= 4.18, glibc >= 2.28     | Tier 2       | 如 Ubuntu 20.04、RHEL 8               |
+| GNU/Linux  | s390x >=z14      | kernel >= 4.18, glibc >= 2.28     | Tier 2       | 如 RHEL 8                             |
+| GNU/Linux  | armv7 / x86 / loong64 / riscv64 | 见英文原版          | Experimental |                                       |
+| Windows    | x64              | >= Windows 10/Server 2016         | Tier 1       | mintty 等终端需 winpty;不支持 WSL     |
+| Windows    | arm64            | >= Windows 10                     | Tier 2       |                                       |
+| macOS      | arm64            | >= 13.5                           | Tier 1       | 编译需 Xcode 16                       |
+| macOS      | x64              | >= 13.5                           | Tier 2       | 2028 年初前                           |
+| SmartOS    | x64              | >= 18                             | Tier 2       |                                       |
+| AIX        | ppc64be >=power9 | >= 7.2 TL04                       | Tier 2       |                                       |
+| FreeBSD    | x64              | >= 13.2                           | Experimental |                                       |
+| OpenHarmony| arm64            | >= 5.0                            | Experimental |                                       |
 
-Platforms may move between tiers between major release lines. The table below
-will reflect those changes.
+### 受支持的工具链
 
-### Platform list
+| 操作系统 | 编译器版本                                                          |
+| -------- | ------------------------------------------------------------------- |
+| Linux    | GCC >= 13.2 或 Clang >= 19.1                                        |
+| Windows  | 64 位主机上的 Visual Studio 2022 或 2026 + Windows 11 SDK           |
+| macOS    | Xcode >= 16.4(Apple LLVM >= 19)                                    |
 
-Node.js compilation/execution support depends on operating system, architecture,
-and libc version. The table below lists the support tier for each supported
-combination. A list of [supported compile toolchains](#supported-toolchains) is
-also supplied for tier 1 platforms.
+<https://nodejs.org/download/release/> 上的官方二进制在 RHEL 8(Linux,Clang 20.1)、Windows Server 2022(Visual Studio 2022)、macOS 15(Xcode 16,最低兼容 13.5)、AIX 7.2 TL04(Clang 20.1)等系统上产出。自 Node.js 25 起,官方 Linux 二进制链接 `libatomic`,运行环境需已安装 `libatomic`(或 `libatomic1`)运行时。
 
-**For production applications, run Node.js on supported platforms only (Tier 1 or 2).**
+### 本文档的历史版本
 
-Node.js does not support a platform version if a vendor has expired support
-for it. In other words, Node.js does not support running on End-of-Life (EoL)
-platforms. This is true regardless of entries in the table below.
+支持的平台与工具链随 Node.js 每个主版本变化。本文档仅对当前版本有效。查阅其他版本文档,请下载对应源码包或检出相应 git 标签。
 
-| Operating System | Architectures    | Versions                          | Support Type | Notes                                                      |
-| ---------------- | ---------------- | --------------------------------- | ------------ | ---------------------------------------------------------- |
-| GNU/Linux        | x64              | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8                       |
-| GNU/Linux        | x64              | kernel >= 3.10, musl >= 1.1.19    | Experimental | e.g. Alpine 3.8                                            |
-| GNU/Linux        | x86              | kernel >= 3.10, glibc >= 2.17     | Experimental | Downgraded as of Node.js 10                                |
-| GNU/Linux        | arm64            | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8                       |
-| GNU/Linux        | armv7            | kernel >= 4.18[^1], glibc >= 2.28 | Experimental | Downgraded as of Node.js 24                                |
-| GNU/Linux        | ppc64le >=power9 | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. Ubuntu 20.04, RHEL 8                                  |
-| GNU/Linux        | s390x >=z14      | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. RHEL 8                                                |
-| GNU/Linux        | loong64          | kernel >= 5.19, glibc >= 2.36     | Experimental |                                                            |
-| GNU/Linux        | riscv64          | kernel >= 5.19, glibc >= 2.36     | Experimental | GCC >= 14 or Clang >= 19 for native builds[^5]             |
-| Windows          | x64              | >= Windows 10/Server 2016         | Tier 1       | [^2],[^3]                                                  |
-| Windows          | arm64            | >= Windows 10                     | Tier 2       |                                                            |
-| macOS            | x64              | >= 13.5                           | Tier 2       | Until early 2028[^8]. For notes about compilation see [^4] |
-| macOS            | arm64            | >= 13.5                           | Tier 1       |                                                            |
-| SmartOS          | x64              | >= 18                             | Tier 2       |                                                            |
-| AIX              | ppc64be >=power9 | >= 7.2 TL04                       | Tier 2       |                                                            |
-| FreeBSD          | x64              | >= 13.2                           | Experimental |                                                            |
-| OpenHarmony      | arm64            | >= 5.0                            | Experimental |                                                            |
+## 在受支持平台上构建 Node.js
 
-<!--lint disable final-definition-->
+### 前提条件
 
-[^1]: Older kernel versions may work. However, official Node.js release
-    binaries are [built on RHEL 8 systems](#official-binary-platforms-and-toolchains)
-    with kernel 4.18.
+* [受支持的 Python 版本][Python versions](不含预发布版本),用于构建和测试。
+* 若需[构建带 Temporal 支持的 Node.js](https://github.com/nodejs/node/blob/HEAD/BUILDING.md#building-nodejs-with-temporal-support),需要 Rust 工具链。
+* 内存:4 个并行编译任务(如 `make -j4`)通常至少需要 8GB 内存。
 
-[^2]: On Windows, running Node.js in Windows terminal emulators
-    like `mintty` requires the usage of [winpty](https://github.com/rprichard/winpty)
-    for the tty channels to work (e.g. `winpty node.exe script.js`).
-    In "Git bash" if you call the node shell alias (`node` without the `.exe`
-    extension), `winpty` is used automatically.
+### Unix 与 macOS
 
-[^3]: The Windows Subsystem for Linux (WSL) is not
-    supported, but the GNU/Linux build process and binaries should work. The
-    community will only address issues that reproduce on native GNU/Linux
-    systems. Issues that only reproduce on WSL should be reported in the
-    [WSL issue tracker](https://github.com/Microsoft/WSL/issues). Running the
-    Windows binary (`node.exe`) in WSL will not work without workarounds such as
-    stdio redirection.
+Unix 前提条件:
 
-[^4]: Our macOS Binaries are compiled with 13.5 as a target. Xcode 16 is
-    required to compile.
+* `gcc`/`g++` >= 13.2 或 `clang`/`clang++` >= 19.1
+* GNU Make 3.81 或更新
+* [受支持的 Python 版本][Python versions](做测试覆盖率需含 pip)
 
-[^5]: Native riscv64 builds need GCC >= 14 or Clang >= 19 because V8
-    includes `<riscv_vector.h>` and uses `target("arch=+v")` in
-    `deps/v8/src/base/cpu.cc`. GCC 13's `riscv_vector.h` errors out without
-    `-march=rv64gcv` and doesn't support the `target` attribute at all.
-    Cross-compilation from x64 is unaffected (the code is behind
-    `V8_HOST_ARCH_RISCV64`).
-
-[^8]: Our macOS testing infrastructure provider has announced end of support for
-    Intel-based architecture for early 2028 at which time that platform will move to
-    experimental status as the Node.js project will no longer be able to test changes on any
-    Intel-based macOS version. When this change occurs the project intends to continue
-    creating universal binaries for versions of Node.js which are still in support which will
-    be compatible with both Apple Silicon-based and Intel-based macOS versions but
-    they will be untested.
-
-<!--lint enable final-definition-->
-
-### Supported toolchains
-
-Depending on the host platform, the selection of toolchains may vary.
-
-| Operating System | Compiler Versions                                                   |
-| ---------------- | ------------------------------------------------------------------- |
-| Linux            | GCC >= 13.2 or Clang >= 19.1                                        |
-| Windows          | Visual Studio 2022 or 2026 with the Windows 11 SDK on a 64-bit host |
-| macOS            | Xcode >= 16.4 (Apple LLVM >= 19)                                    |
-
-### Official binary platforms and toolchains
-
-Binaries at <https://nodejs.org/download/release/> are produced on:
-
-| Binary package          | Platform and Toolchain                                        |
-| ----------------------- | ------------------------------------------------------------- |
-| aix-ppc64               | AIX 7.2 TL04 on PPC64BE with Clang 20.1                       |
-| darwin-x64              | macOS 15, Xcode 16 with -mmacosx-version-min=13.5             |
-| darwin-arm64 (and .pkg) | macOS 15 (arm64), Xcode 16 with -mmacosx-version-min=13.5     |
-| linux-arm64             | RHEL 8 with Clang 20.1 and gcc-toolset-14-libatomic-devel[^6] |
-| linux-ppc64le           | RHEL 8 with Clang 20.1 and gcc-toolset-14-libatomic-devel[^6] |
-| linux-s390x             | RHEL 8 with Clang 20.1 and gcc-toolset-14-libatomic-devel[^6] |
-| linux-x64               | RHEL 8 with Clang 20.1 and gcc-toolset-14-libatomic-devel[^6] |
-| win-arm64               | Windows Server 2022 (x64) with Visual Studio 2022             |
-| win-x64                 | Windows Server 2022 (x64) with Visual Studio 2022             |
-
-Starting with Node.js 25, official Linux binaries are linked with `libatomic` and these systems
-must have the `libatomic` runtime installed and available at execution time to run the binaries.
-The package name for the `libatomic` runtime is typically `libatomic` or `libatomic1` depending
-on your Linux distribution.
-
-<!--lint disable final-definition-->
-
-[^6]: Binaries produced on these systems are compatible with glibc >= 2.28
-    and libstdc++ >= 6.0.25 (`GLIBCXX_3.4.25`). These are available on
-    distributions natively supporting GCC 8.1 or higher, such as Debian 10,
-    RHEL 8 and Ubuntu 20.04.
-
-<!--lint enable final-definition-->
-
-#### OpenSSL asm support
-
-OpenSSL-1.1.1 requires the following assembler version for use of asm
-support on x86\_64 and ia32.
-
-For use of AVX-512,
-
-* gas (GNU assembler) version 2.26 or higher
-* nasm version 2.11.8 or higher in Windows
-
-AVX-512 is disabled for Skylake-X by OpenSSL-1.1.1.
-
-For use of AVX2,
-
-* gas (GNU assembler) version 2.23 or higher
-* Xcode version 5.0 or higher
-* llvm version 3.3 or higher
-* nasm version 2.10 or higher in Windows
-
-Please refer to <https://docs.openssl.org/1.1.1/man3/OPENSSL_ia32cap/> for details.
-
-If compiling without one of the above, use `configure` with the
-`--openssl-no-asm` flag. Otherwise, `configure` will fail.
-
-### Previous versions of this document
-
-Supported platforms and toolchains change with each major version of Node.js.
-This document is only valid for the current version of Node.js, and is expected
-to be valid for the entire lifetime of this release line.
-
-To consult the version of this document for another version, download its source
-tarball and/or browse the git repository checked out at the relevant tag.
-
-## Building Node.js on supported platforms
-
-### Prerequisites
-
-* [A supported version of Python][Python versions] (excludes pre-release versions) for building and testing.
-* A Rust toolchain if [building Node.js with Temporal support](#building-nodejs-with-temporal-support).
-* Memory: at least 8GB of RAM is typically required when compiling with 4 parallel jobs (e.g: `make -j4`).
-
-### Unix and macOS
-
-#### Unix prerequisites
-
-* `gcc` and `g++` >= 13.2 or `clang` and `clang++` >= 19.1
-* GNU Make 3.81 or newer
-* [A supported version of Python][Python versions]
-  * For test coverage, your Python installation must include pip.
-
-Installation via Linux package manager can be achieved with:
-
-* Nix, NixOS: `nix-shell`
-* Ubuntu, Debian: `sudo apt-get install python3 g++-13 gcc-13 make python3-pip`
-* Fedora: `sudo dnf install python3 gcc-c++ make python3-pip`
-* CentOS and RHEL: `sudo yum install python3 gcc-c++ make python3-pip`
-* OpenSUSE: `sudo zypper install python3 gcc-c++ make python3-pip`
-* Arch Linux, Manjaro: `sudo pacman -S python gcc make python-pip`
-
-FreeBSD and OpenBSD users may also need to install `libexecinfo`.
-
-#### macOS prerequisites
-
-* Xcode Command Line Tools >= 16.4 for macOS
-* [A supported version of Python][Python versions]
-  * For test coverage, your Python installation must include pip.
-
-macOS users can install the `Xcode Command Line Tools` by running
-`xcode-select --install`. Alternatively, if you already have the full Xcode
-installed, you can find them under the menu `Xcode -> Open Developer Tool ->
-More Developer Tools...`. This step will install `clang`, `clang++`, and
-`make`.
-
-#### Nix integration
-
-If you are using Nix and direnv, you can use the following to get started:
+可通过发行版包管理器安装,例如:
 
 ```bash
-echo 'use_nix --arg sharedLibDeps {} --argstr icu small' > .envrc
-direnv allow .
-make build-ci -j12
+# Ubuntu / Debian
+sudo apt-get install python3 g++-13 gcc-13 make python3-pip
+# Fedora
+sudo dnf install python3 gcc-c++ make python3-pip
+# CentOS / RHEL
+sudo yum install python3 gcc-c++ make python3-pip
 ```
 
-Most dependencies will likely be available in the official nixpkgs cache,
-although for some dependencies we have to deviate for the upstream repository,
-in which case those will be built locally, or you can use the Cachix repository
-for the project: `cachix use nodejs`. See <https://docs.cachix.org/> for more
-information.
+macOS 前提条件:Xcode Command Line Tools >= 16.4(运行 `xcode-select --install` 安装,将同时装好 `clang`、`clang++` 和 `make`),以及受支持的 Python 版本。
 
-The use of `make build-ci` is to ensure you are using the `CONFIG_FLAGS`
-environment variable. You can also specify it manually:
-
-```bash
-./configure $CONFIG_FLAGS
-make -j12
-```
-
-Passing the `--arg sharedLibDeps {}` instructs direnv and Nix to generate an
-environment that uses the vendored-in native dependencies. Using the vendored-in
-dependencies result in a result closer to the official binaries, the tradeoff
-being the build will take longer to complete as you'd have to build those
-dependencies instead of using the cached ones from the Nix cache. You can omit
-that flag to use all the shared dependencies, or specify only some dependencies:
-
-```bash
-cat -> .envrc <<'EOF'
-use nix --arg sharedLibDeps '{
-  inherit (import ./tools/nix/sharedLibDeps.nix {})
-    openssl
-    zlib
-  ;
-}'
-EOF
-```
-
-Passing the `--argstr icu small` instructs direnv and Nix to pass `--with-intl=small` in
-the `CONFIG_FLAGS` environment variable. If you omit this, the prebuilt ICU from Nix cache
-will be used, which should speed up greatly compilation time.
-
-The use of `direnv` is completely optional, you can also use `nix-shell` directly,
-e.g. here's a command you can use to build a binary for benchmarking purposes:
-
-```bash
-# Passing `--arg loadJSBuiltinsDynamically false` to instruct the compiler to
-# embed the JS core files so it is no longer affected by local changes
-# (necessary for getting useful benchmark results).
-# Passing `--arg devTools '[]' --arg benchmarkTools '[]'` since we don't need
-# those to build node.
-nix-shell \
-  --arg loadJSBuiltinsDynamically false \
-  --arg devTools '[]' --arg benchmarkTools '[]' \
-  --run 'make build-ci -j12'
-
-mv out/Release/node ./node_old
-
-# ...
-# Make your local changes, and re-build node
-
-nix-shell \
-  --arg loadJSBuiltinsDynamically false \
-  --arg devTools '[]' --arg benchmarkTools '[]' \
-  --run 'make build-ci -j12'
-
-nix-shell --pure --run './node benchmark/compare.js --old ./node_old  --new ./node http | Rscript benchmark/compare.R'
-```
-
-There are additional attributes you can pass, see `shell.nix` file for more details.
-
-#### Building Node.js
-
-If the path to your build directory contains a space, the build will likely
-fail.
-
-To build Node.js:
+构建 Node.js:
 
 ```bash
 ./configure
@@ -365,801 +92,113 @@ make -j4
 ```
 
 > \[!IMPORTANT]
-> If you face a compilation error during this process such as
-> `error: no matching conversion for functional-style cast from 'unsigned int' to 'TypeIndex'`
-> Make sure to use a `g++` or `clang` version compatible with C++20.
+> 若编译报 `error: no matching conversion for functional-style cast from 'unsigned int' to 'TypeIndex'` 之类的错误,请确认 `g++`/`clang` 版本兼容 C++20。
 
-We can speed up the builds by using [Ninja](https://ninja-build.org/). For more
-information, see
-[Building Node.js with Ninja](doc/contributing/building-node-with-ninja.md).
+`-j4` 让 `make` 同时跑 4 个编译任务以缩短构建时间。也可以用 [Ninja](https://ninja-build.org/) 加速,详见[用 Ninja 构建 Node.js](doc/contributing/building-node-with-ninja.md)。若构建目录路径包含空格,构建很可能失败。
 
-The `-j4` option will cause `make` to run 4 simultaneous compilation jobs which
-may reduce build time. For more information, see the
-[GNU Make Documentation](https://www.gnu.org/software/make/manual/html_node/Parallel.html).
-
-The above requires that `python` resolves to a supported version of
-Python. See [Prerequisites](#prerequisites).
-
-After building, setting up [firewall rules](tools/macos-firewall.sh) can avoid
-popups asking to accept incoming network connections when running tests.
-
-Running the following script on macOS will add the firewall rules for the
-executable `node` in the `out` directory and the symbolic `node` link in the
-project's root directory.
-
-```bash
-sudo ./tools/macos-firewall.sh
-```
-
-#### Installing Node.js
-
-To install this version of Node.js into a system directory:
+安装到系统目录:
 
 ```bash
 [sudo] make install
 ```
 
-#### Running tests
-
-To verify the build:
+#### 运行测试
 
 ```bash
-make test-only
+make test
 ```
 
-At this point, you are ready to make code changes and re-run the tests.
+可运行 `make test-only` 跳过构建检查只跑测试。完整说明见英文原版。
 
-If you are running tests before submitting a pull request, use:
-
-```bash
-make -j4 test
-```
-
-`make -j4 test` does a full check on the codebase, including documentation tests.
-
-To run the linter, use `make lint`/`vcbuild lint`. It will lint JavaScript, C++, and Markdown files.
-
-To fix auto fixable JavaScript linting errors, use `make lint-js-fix`.
-
-If you are updating tests and want to run tests in a single test file
-(e.g. `test/parallel/test-stream2-transform.js`):
-
-```bash
-tools/test.py test/parallel/test-stream2-transform.js
-```
-
-You can execute the entire suite of tests for a given subsystem
-by providing the name of a subsystem:
-
-```bash
-tools/test.py child-process
-```
-
-You can also execute the tests in a test suite directory
-(such as `test/message`):
-
-```bash
-tools/test.py test/message
-```
-
-You can execute tests that match a specific naming pattern using the wildcard
-`*`. For example, to run all tests under `test/parallel` with a name that starts
-with `test-stream-`:
-
-```bash
-tools/test.py test/parallel/test-stream-*
-tools/test.py parallel/test-stream-*  # The test/ prefix can be omitted
-# In some shell environments, you may need to quote the pattern
-tools/test.py "test/parallel/test-stream-*"
-```
-
-The wildcard `*` can be used in any part of the path. For example, to run all tests
-with a name that starts with `test-inspector-`, regardless of the directory they are in:
-
-```bash
-# Matches test/sequential/test-inspector-*, test/parallel/test-inspector-*,
-# test/known_issues/test-inspector-*, etc.
-tools/test.py "test/*/test-inspector-*"
-tools/test.py "*/test-inspector-*"  # The test/ prefix can be omitted
-```
-
-If you want to check the other options, please refer to the help by using
-the `--help` option:
-
-```bash
-tools/test.py --help
-```
-
-> Note: On Windows you should use `python3` executable.
-> Example: `python3 tools/test.py test/message`
-
-You can usually run tests directly with node:
-
-```bash
-./node test/parallel/test-stream2-transform.js
-```
-
-> Info: `./node` points to your local Node.js build.
-
-Remember to recompile with `make -j4` in between test runs if you change code in
-the `lib` or `src` directories.
-
-The tests attempt to detect support for IPv6 and exclude IPv6 tests if
-appropriate. If your main interface has IPv6 addresses, then your
-loopback interface must also have '::1' enabled. For some default installations
-on Ubuntu, that does not seem to be the case. To enable '::1' on the
-loopback interface on Ubuntu:
-
-```bash
-sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0
-```
-
-You can use
-[node-code-ide-configs](https://github.com/nodejs/node-code-ide-configs)
-to run/debug tests if your IDE configs are present.
-
-#### Running coverage
-
-It's good practice to ensure any code you add or change is covered by tests.
-You can do so by running the test suite with coverage enabled:
-
-```bash
-./configure --coverage
-make coverage
-```
-
-A detailed coverage report will be written to `coverage/index.html` for
-JavaScript coverage and to `coverage/cxxcoverage.html` for C++ coverage.
-
-If you only want to run the JavaScript tests then you do not need to run
-the first command (`./configure --coverage`). Run `make coverage-run-js`,
-to execute JavaScript tests independently of the C++ test suite:
-
-```bash
-make coverage-run-js
-```
-
-If you are updating tests and want to collect coverage for a single test file
-(e.g. `test/parallel/test-stream2-transform.js`):
-
-```bash
-make coverage-clean
-NODE_V8_COVERAGE=coverage/tmp tools/test.py test/parallel/test-stream2-transform.js
-make coverage-report-js
-```
-
-You can collect coverage for the entire suite of tests for a given subsystem
-by providing the name of a subsystem:
-
-```bash
-make coverage-clean
-NODE_V8_COVERAGE=coverage/tmp tools/test.py --mode=release child-process
-make coverage-report-js
-```
-
-The `make coverage` command downloads some tools to the project root directory.
-To clean up after generating the coverage reports:
-
-```bash
-make coverage-clean
-```
-
-#### Building the documentation
-
-To build the documentation:
-
-This will build Node.js first (if necessary) and then use it to build the docs:
+#### 构建文档
 
 ```bash
 make doc
 ```
 
-If you have an existing Node.js build, you can build just the docs with:
+构建后的文档位于 `out/doc`。可用 `make docserve` 起本地服务器预览,或 `make docclean` 清理。
 
-```bash
-NODE=/path/to/node make doc-only
-```
+#### 加速频繁重建
 
-To read the man page:
+* **ccache**:若需频繁重建(尤其多分支切换),安装 `ccache` 可大幅缩短构建时间,例如 `sudo apt install ccache` 后设置 `export CC="ccache gcc"`、`export CXX="ccache g++"`(写入 `.profile`)。
+* **从磁盘加载 JS 文件而非内嵌**:只改 `lib` 中的 JS 层时,可执行 `./configure --node-builtin-modules-path "$(pwd)"`,产出的二进制不含 JS 文件、从指定目录加载,便于配合 VS Code 调试断点。
 
-```bash
-man doc/node.1
-```
+#### Unix/macOS 构建排障
 
-If you prefer to read the full documentation in a browser, run the following.
-
-```bash
-make docserve
-```
-
-This will spin up a static file server and provide a URL to where you may browse
-the documentation locally.
-
-If you're comfortable viewing the documentation using the program your operating
-system has associated with the default web browser, run the following.
-
-```bash
-make docopen
-```
-
-This will open a file URL to a one-page version of all the browsable HTML
-documents using the default browser.
-
-```bash
-make docclean
-```
-
-This will clean previously built doc.
-
-To test if Node.js was built correctly:
-
-```bash
-./node -e "console.log('Hello from Node.js ' + process.version)"
-```
-
-#### Building a debug build
-
-If you run into an issue where the information provided by the JS stack trace
-is not enough, or if you suspect the error happens outside of the JS VM, you
-can try to build a debug enabled binary:
-
-```bash
-./configure --debug
-make -j4
-```
-
-`make` with `./configure --debug` generates two binaries, the regular release
-one in `out/Release/node` and a debug binary in `out/Debug/node`, only the
-release version is actually installed when you run `make install`.
-
-To use the debug build with all the normal dependencies overwrite the release
-version in the install directory:
-
-```bash
-make install PREFIX=/opt/node-debug/
-cp -a -f out/Debug/node /opt/node-debug/node
-```
-
-When using the debug binary, core dumps will be generated in case of crashes.
-These core dumps are useful for debugging when provided with the
-corresponding original debug binary and system information.
-
-Reading the core dump requires `gdb` built on the same platform the core dump
-was captured on (i.e. 64-bit `gdb` for `node` built on a 64-bit system, Linux
-`gdb` for `node` built on Linux) otherwise you will get errors like
-`not in executable format: File format not recognized`.
-
-Example of generating a backtrace from the core dump:
-
-```bash
-$ gdb /opt/node-debug/node core.node.8.1535359906
-(gdb) backtrace
-```
-
-#### Building an ASan build
-
-[ASan](https://github.com/google/sanitizers) can help detect various memory
-related bugs. ASan builds are currently only supported on linux.
-If you want to check it on Windows or macOS or you want a consistent toolchain
-on Linux, you can try [Docker](https://www.docker.com/products/docker-desktop/)
-(using an image like `gengjiawen/node-build:2020-02-14`).
-
-The `--debug` is not necessary and will slow down build and testing, but it can
-show a clear stack trace if ASan hits an issue.
-
-```bash
-./configure --debug --enable-asan && make -j4
-make test-only
-```
-
-#### Speeding up frequent rebuilds when developing
-
-##### ccache
-
-Tips: The `ccache` utility is widely used and should generally work fine.
-If you encounter any difficulties, consider disabling `mold` as a
-troubleshooting step.
-
-If you plan to frequently rebuild Node.js, especially if using several
-branches, installing `ccache` can help to greatly reduce build
-times. Set up with:
-
-On GNU/Linux:
-
-Tips: `mold` can speed up the link process, which can't be cached, you may
-need to install the latest version but not the apt version.
-
-```bash
-sudo apt install ccache mold   # for Debian/Ubuntu, included in most Linux distros
-export CC="ccache gcc"         # add to your .profile
-export CXX="ccache g++"        # add to your .profile
-export LDFLAGS="-fuse-ld=mold" # add to your .profile
-```
-
-Refs:
-
-1. <https://ccache.dev/performance.html>
-2. <https://github.com/rui314/mold>
-
-On macOS:
-
-```bash
-brew install ccache            # see https://brew.sh
-export CC="ccache cc"          # add to ~/.zshrc or other shell config file
-export CXX="ccache c++"        # add to ~/.zshrc or other shell config file
-```
-
-##### Loading JS files from disk instead of embedding
-
-When modifying only the JS layer in `lib`, it is possible to externally load it
-without modifying the executable:
-
-```bash
-./configure --node-builtin-modules-path "$(pwd)"
-```
-
-The resulting binary won't include any JS files and will try to load them from
-the specified directory. The JS debugger of Visual Studio Code supports this
-configuration since the November 2020 version and allows for setting
-breakpoints.
-
-#### Troubleshooting Unix and macOS builds
-
-Stale builds can sometimes result in `file not found` errors while building.
-This and some other problems can be resolved with `make distclean`. The
-`distclean` recipe aggressively removes build artifacts. You will need to
-build again (`make -j4`). Since all build artifacts have been removed, this
-rebuild may take a lot more time than previous builds. Additionally,
-`distclean` removes the file that stores the results of `./configure`. If you
-ran `./configure` with non-default options (such as `--debug`), you will need
-to run it again before invoking `make -j4`.
-
-If you received the error `nodejs g++ fatal error compilation terminated cc1plus`
-during compilation, this is likely a memory issue and you should either provide
-more RAM or create swap space to accommodate toolchain requirements or reduce
-the number of parallel build tasks (`-j<n>`).
+* 陈旧的构建产物可能导致 `file not found` 等错误,用 `make distclean` 清理后需重新 `./configure`(非默认选项需重跑)再 `make -j4`。
+* 出现 `g++ fatal error compilation terminated cc1plus` 通常是内存不足:增加内存/交换空间,或降低并行任务数(`-j<n>`)。
 
 ### Windows
 
-#### Tips
+前提条件(手动安装):
 
-You may need to disable vcpkg integration if you encounter a link error about symbol
-redefinition related to zlib.lib(zlib1.dll), even if you never installed it by hand,
-as vcpkg is part of CLion and Visual Studio now.
+* 当前版本的 [Python][Python downloads](参照 [Using Python on Windows][])。
+* 从 [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/) 下载安装 Visual Studio Community Edition 2026(或 Build Tools for Visual Studio 2026,磁盘占用最小;Professional/Enterprise 亦可)。安装时勾选"使用 C++ 的桌面开发"工作负载。
+* 自 Node.js 24.0.0 起,Windows 编译要求 ClangCL,需额外勾选两个可选组件:
+  * C++ Clang Compiler for Windows(Microsoft.VisualStudio.Component.VC.Llvm.Clang)
+  * MSBuild support for LLVM (clang-cl) toolset(Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset)
+* 也可用 Visual Studio 2022 Current 通道 17.14 版替代 2026,组件选择相同。
+* Node.js 26 引入的 Temporal 支持所需 Rust 工具链:先装好 Visual Studio,再运行 [Install Rust](https://rust-lang.org/tools/install/) 下载的 `rustup-init.exe`,选默认"Proceed with standard installation"。
+* 部分测试需要基本 Unix 工具:[Git for Windows](https://git-scm.com/download/win) 自带的 Git Bash 工具可加入全局 `PATH`。
+* OpenSSL 汇编模块需要 [NetWide Assembler](https://www.nasm.us/);未装在默认位置时需手动加入 `PATH`(`--openssl-no-asm` 构建和 ARM64 Windows 目标不需要)。
 
-```powershell
-# find your vcpkg
-# double check vcpkg install the related file
-vcpkg owns zlib.lib
-vcpkg owns zlib1.dll
-vcpkg integrate remove
-```
+也可用 [WinGet 配置文件](./.configurations)自动安装全部前提(Git for Windows、Python 3.14、Visual Studio 2022 + 工作负载与 Clang 组件、Rust 工具链、NASM),在 PowerShell 中配合 [winget configure](https://learn.microsoft.com/en-us/windows/package-manager/winget/configure#configure-subcommands) 使用。
 
-Refs:
-
-1. <https://github.com/nodejs/node/issues/24448>
-2. <https://github.com/microsoft/vcpkg/issues/37518> / <https://github.com/microsoft/vcpkg/discussions/37546>
-3. [vcpkg](https://github.com/microsoft/vcpkg/)
-
-#### Windows Prerequisites
-
-##### Option 1: Manual install
-
-* The current [version of Python][Python downloads] by following the instructions in
-  [Using Python on Windows][].
-* Select and download the Visual Studio Community Edition 2026 from
-  [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/) or alternatively download
-  [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026),
-  and then install.
-  The Build Tools Edition has the lowest disk space requirements of all editions.
-  Professional or Enterprise Editions can also be alternatively selected.
-* During installation of Visual Studio, select the "Desktop development with C++" workload.
-  As of Node.js 24.0.0, ClangCL is required to compile on Windows.
-  To install it, select the following two optional components:
-  * C++ Clang Compiler for Windows (Microsoft.VisualStudio.Component.VC.Llvm.Clang)
-  * MSBuild support for LLVM (clang-cl) toolset (Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset)
-* As an alternative to Visual Studio 2026, download Visual Studio 2022 Current channel Version 17.14 from the
-  [Evergreen bootstrappers](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history#evergreen-bootstrappers)
-  table and install using the same workload and optional component selection as described above.
-* To install the Rust toolchain, required for Temporal support introduced in Node.js 26,
-  ensure Visual Studio is already installed, then run `rustup-init.exe` downloaded from
-  [Install Rust](https://rust-lang.org/tools/install/),
-  choosing the default: "Proceed with standard installation".
-* Basic Unix tools required for some tests,
-  [Git for Windows](https://git-scm.com/download/win) includes Git Bash
-  and tools which can be included in the global `PATH`.
-* The [NetWide Assembler](https://www.nasm.us/), for OpenSSL assembler modules.
-  If not installed in the default location, it needs to be manually added
-  to `PATH`. A build with the `openssl-no-asm` option does not need this, nor
-  does a build targeting ARM64 Windows.
-
-After you have installed any Visual Studio Edition you can add optional components using the
-Modify / Individual Components tab of Visual Studio Installer.
-
-Optional component required to build the MSI installer package:
-
-* The .NET SDK individual component (Microsoft.NetCore.Component.SDK)
-
-Optional components required to compile for Windows on ARM64:
-
-* MSVC Build Tools for ARM64/ARM64EC (Microsoft.VisualStudio.Component.VC.Tools.ARM64)
-* C++ ATL for ARM64 (Microsoft.VisualStudio.Component.VC.ATL.ARM64)
-
-NOTE: Currently we only support compiling with Clang that comes from Visual Studio.
-
-When building with ClangCL, if the output from `vcbuild.bat` shows that the components are not installed,
-even when the Visual Studio Installer shows that they are installed, try removing the components
-first and then reinstalling them.
-
-##### Option 2: Automated install with WinGet
-
-[WinGet configuration files](./.configurations)
-can be used to install all the required prerequisites for Node.js development
-easily. These files will install the following
-[WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) packages:
-
-* Git for Windows with the `git` and Unix tools added to the `PATH`
-* `Python 3.14`
-* `Visual Studio 2022` (Build Tools, Community, Professional or Enterprise Edition) and
-  "Desktop development with C++" workload, Clang and ClangToolset optional components
-* `Rust Toolchain MSVC`
-* `NetWide Assembler`
-
-The following Desired State Configuration (DSC) files are available:
-
-| Edition      | DSC Configuration                                                                                |
-| ------------ | ------------------------------------------------------------------------------------------------ |
-| Build Tools  | [configuration.vsBuildTools.dsc.yaml](./.configurations/configuration.vsBuildTools.dsc.yaml)     |
-| Community    | [configuration.dsc.yaml](./.configurations/configuration.dsc.yaml)                               |
-| Professional | [configuration.vsProfessional.dsc.yaml](./.configurations/configuration.vsProfessional.dsc.yaml) |
-| Enterprise   | [configuration.vsEnterprise.dsc.yaml](./.configurations/configuration.vsEnterprise.dsc.yaml)     |
-
-Use one of the above DSC files with
-[winget configure](https://learn.microsoft.com/en-us/windows/package-manager/winget/configure#configure-subcommands)
-in a PowerShell Terminal to install Node.js prerequisites.
-For example, using the DSC file for Visual Studio Community Edition, execute the following command line:
+构建 Node.js(在 `vcbuild.bat` 所在目录):
 
 ```powershell
-winget configure .\.configurations\configuration.dsc.yaml
-```
-
-To add optional components for MSI or ARM64 builds, refer to [Option 1: Manual install](#option-1-manual-install).
-
-#### Building Node.js
-
-* Remember to first clone the Node.js repository with the Git command
-  and head to the directory that Git created; If you haven't already
-  ```powershell
-  git clone https://github.com/nodejs/node.git
-  cd node
-  ```
-
-> \[!TIP]
-> If you are building from a Windows machine, symlinks are disabled by default, and can be enabled by cloning
-> with the `-c core.symlinks=true` flag.
->
-> ```powershell
-> git clone -c core.symlinks=true <repository_url>
-> ```
-
-* If the path to your build directory contains a space or a non-ASCII character,
-  the build will likely fail
-
-To start the build process:
-
-```powershell
+# 构建调试版(不带符号):
+.\vcbuild build-release
+# 或按交互提示:
 .\vcbuild
 ```
 
-To run the tests:
-
-```powershell
-.\vcbuild test
-```
-
-To test if Node.js was built correctly:
-
-```powershell
-Release\node -e "console.log('Hello from Node.js', process.version)"
-```
-
-> \[!TIP]
-> On Windows, creating symlinks requires [Developer Mode][] to be enabled or
-> running the command as Administrator. Tests that rely on creating symlinks
-> may fail with EPERM errors if symlink creation is not permitted.
-
-##### Using ccache:
-
-Follow <https://github.com/ccache/ccache/wiki/MS-Visual-Studio>, and you
-should notice that obj file will be bigger than the normal one.
-
-First, install ccache. Assuming the installation of ccache is in `c:\ccache`
-(where you can find `ccache.exe`), copy `c:\ccache\ccache.exe` to `c:\ccache\cl.exe`
-with this command.
-
-```powershell
-cp c:\ccache\ccache.exe c:\ccache\cl.exe
-```
-
-With newer version of Visual Studio, it may need the copy to be `clang-cl.exe`
-instead. If the output of `vcbuild.bat` suggests missing `clang-cl.exe`, copy
-it differently:
-
-```powershell
-cp c:\ccache\ccache.exe c:\ccache\clang-cl.exe
-```
-
-When building Node.js, provide a path to your ccache via the option:
-
-```powershell
-.\vcbuild.bat ccache c:\ccache\
-```
-
-This will allow for near-instantaneous rebuilds when switching branches back
-and forth that were built with cache.
-
-To use it with ClangCL, run this instead:
-
-```powershell
-.\vcbuild.bat clang-cl ccache c:\ccache\
-```
+可用 `vcbuild.bat help` 查看全部选项。若遇到与 zlib.lib/zlib1.dll 相关的符号重定义链接错误,可能需要 `vcpkg integrate remove` 移除 vcpkg 集成。
 
 ### Android
 
-Android is not a supported platform. Patches to improve the Android build are
-welcome. There is no testing on Android in the current continuous integration
-environment. The participation of people dedicated and determined to improve
-Android building, testing, and support is encouraged.
+参照英文原版 `Building Node.js on Android` 一节,使用 `android-configure` 脚本配置 NDK 交叉编译环境。
 
-Be sure you have downloaded and extracted
-[Android NDK](https://developer.android.com/ndk) before in
-a folder. Then run:
+## `Intl`(ECMA-402)支持概览
 
-```bash
-./android-configure <path to the Android NDK> <Android SDK version> <target architecture>
-make -j4
-```
+Node.js 的 Intl 支持由 `configure` 的 `--with-intl` 参数决定,四种模式:
 
-The Android SDK version should be at least 24 (Android 7.0) and the target
-architecture supports \[arm, arm64/aarch64, x86, x86\_64].
+* **full-icu**(完整 ICU,支持全部语言环境;默认随构建下载 ICU 数据):
 
-## `Intl` (ECMA-402) support
+  ```bash
+  # Unix / macOS(需已配置,下载需要网络,也可用 --download=all)
+  ./configure --with-intl=full-icu --download=all
+  ```
 
-[Intl](doc/api/intl.md) support is
-enabled by default.
+  ```powershell
+  # Windows
+  .\vcbuild build-release-icu
+  ```
 
-### Build with full ICU support (all locales supported by ICU)
+* **small-icu**(精简 ICU,仅英语,二进制更小):
 
-This is the default option.
+  ```bash
+  ./configure --with-intl=small-icu
+  ```
 
-#### Unix/macOS
+* **none**(不含 Intl 支持):
 
-```bash
-./configure --with-intl=full-icu
-```
+  ```bash
+  ./configure --with-intl=none
+  ```
 
-#### Windows
+* **system-icu**(链接系统已装的 ICU,仅 Unix/macOS):
 
-```powershell
-.\vcbuild full-icu
-```
+  ```bash
+  ./configure --with-intl=system-icu
+  ```
 
-### Trimmed: `small-icu` (English only) support
+构建时也可用 `--with-icu-source` 指定特定 ICU 源码路径或 tarball。完整细节见英文原版。
 
-In this configuration, only English data is included, but
-the full `Intl` (ECMA-402) APIs. It does not need to download
-any dependencies to function. You can add full data at runtime.
+## 下游发行者注意事项
 
-#### Unix/macOS
+下游 Node.js 发行方(发行版打包者等)的注意事项(如构建产物、文档、测试套件的处理建议)见英文原版对应章节。
 
-```bash
-./configure --with-intl=small-icu
-```
-
-#### Windows
-
-```powershell
-.\vcbuild small-icu
-```
-
-### Building without Intl support
-
-The `Intl` object will not be available, nor some other APIs such as
-`String.normalize`.
-
-#### Unix/macOS
-
-```bash
-./configure --without-intl
-```
-
-#### Windows
-
-```powershell
-.\vcbuild without-intl
-```
-
-### Use existing installed ICU (Unix/macOS only)
-
-```bash
-pkg-config --modversion icu-i18n && ./configure --with-intl=system-icu
-```
-
-If you are cross-compiling, your `pkg-config` must be able to supply a path
-that works for both your host and target environments.
-
-### Build with a specific ICU
-
-You can find other ICU releases at
-[the ICU homepage](https://icu.unicode.org/download).
-Download the file named something like `icu4c-**##.#**-src.tgz` (or
-`.zip`).
-
-To check the minimum recommended ICU, run `./configure --help` and see
-the help for the `--with-icu-source` option. A warning will be printed
-during configuration if the ICU version is too old.
-
-#### Unix/macOS
-
-From an already-unpacked ICU:
-
-```bash
-./configure --with-intl=[small-icu,full-icu] --with-icu-source=/path/to/icu
-```
-
-From a local ICU tarball:
-
-```bash
-./configure --with-intl=[small-icu,full-icu] --with-icu-source=/path/to/icu.tgz
-```
-
-From a tarball URL:
-
-```bash
-./configure --with-intl=full-icu --with-icu-source=http://url/to/icu.tgz
-```
-
-#### Windows
-
-First unpack latest ICU to `deps/icu`
-[icu4c-**##.#**-src.tgz](https://icu.unicode.org/download) (or `.zip`)
-as `deps/icu` (You'll have: `deps/icu/source/...`)
-
-```powershell
-.\vcbuild full-icu
-```
-
-### Configure OpenSSL appname
-
-Node.js can use an OpenSSL configuration file by specifying the environment
-variable `OPENSSL_CONF`, or using the command line option `--openssl-config`,
-which takes precedence. If neither is specified, Node.js defaults to reading the
-default OpenSSL configuration file `openssl.cnf`. Node.js will only read a
-section that is by default named `nodejs_conf`, but this name can be overridden
-using the following configure option:
-
-```bash
-./configure --openssl-conf-name=<some_conf_name>
-```
-
-## Building Node.js with FIPS-compliant OpenSSL
-
-Node.js supports FIPS when statically or dynamically linked with OpenSSL 3 via
-[OpenSSL's provider model](https://docs.openssl.org/3.0/man7/crypto/#OPENSSL-PROVIDERS).
-It is not necessary to rebuild Node.js to enable support for FIPS.
-
-When using OpenSSL 1.1.1, Node.js must be built against a FIPS-capable OpenSSL.
-
-See [FIPS mode](doc/api/crypto.md#fips-mode) for more information on how to
-enable FIPS support in Node.js.
-
-## Building Node.js with Temporal support
-
-Node.js supports the [Temporal](https://github.com/tc39/proposal-temporal) APIs, when
-linking statically or dynamically with a version of [temporal\_rs](https://github.com/boa-dev/temporal).
-Building it requires a Rust toolchain:
-
-* rustc >= 1.86 (with LLVM >= 19)
-* cargo >= 1.86
-
-Refer to [Install Rust](https://rust-lang.org/tools/install/) for instructions.
-Individual packages such as `rust` and `cargo` in some operating system distributions may be considered
-as an alternative, for example in CI environments.
-Consult with relevant operating system documentation to ensure that packages
-meet the minimum version specified above,
-as packaged versions may lag behind the `stable` version installed by the official instructions.
-Avoid mixing `rustup` together with `rust` and `cargo` package installations, due to
-potential version conflicts.
-
-If `--v8-enable-temporal-support` and `--v8-disable-temporal-support` are both
-omitted, `configure.py` probes for `cargo` and `rustc`. If either is missing,
-a warning is printed and Temporal support is disabled.
-
-* Pass `--v8-enable-temporal-support` to `configure.py` to require Temporal
-  support. The build will stop with an error if `cargo` or `rustc` cannot be
-  found.
-* Pass `--v8-disable-temporal-support` to opt out of Temporal support and
-  remove the Rust toolchain requirement.
-
-Passing both options to `configure.py` is an error.
-
-## Building Node.js with external core modules
-
-It is possible to specify one or more JavaScript text files to be bundled in
-the binary as built-in modules when building Node.js.
-
-### Unix/macOS
-
-This command will make `/root/myModule.js` available via
-`require('/root/myModule')` and `./myModule2.js` available via
-`require('myModule2')`.
-
-```bash
-./configure --link-module '/root/myModule.js' --link-module './myModule2.js'
-```
-
-### Windows
-
-To make `./myModule.js` available via `require('myModule')` and
-`./myModule2.js` available via `require('myModule2')`:
-
-```powershell
-.\vcbuild link-module './myModule.js' link-module './myModule2.js'
-```
-
-## Building to use shared dependencies at runtime
-
-By default Node.js is built so that all dependencies are bundled into
-the Node.js binary itself. This provides a single binary that includes
-the correct versions of all dependencies on which it depends.
-
-Some Node.js distributions, however, prefer to manage dependencies.
-A number of `configure` options are provided to support this use case.
-
-* For dependencies with native code, the first set of options allow
-  Node.js to be built so that it uses a shared library
-  at runtime instead of building and including the dependency
-  in the Node.js binary itself. These options are in the
-  `Shared libraries` section of the `configure` help
-  (run `./configure --help` to get the complete list).
-  They provide the ability to enable the use of a shared library,
-  to set the name of the shared library, and to set the paths that
-  contain the include and shared library files.
-
-* For dependencies with JavaScript code (including WASM), the second
-  set of options allow the Node.js binary to be built so that it loads
-  the JavaScript for dependencies at runtime instead of being built into
-  the Node.js binary itself. These options are in the `Shared builtins`
-  section of the `configure` help
-  (run `./configure --help` to get the complete list). They
-  provide the ability to set the path to an external JavaScript file
-  for the dependency to be used at runtime.
-
-It is the responsibility of any distribution
-shipping with these options to:
-
-* ensure that the shared dependencies available at runtime
-  match what is expected by the Node.js binary. A
-  mismatch may result in crashes or unexpected behavior.
-* fully test that Node.js operates as expected with the
-  external dependencies. There may be little or no test coverage
-  within the Node.js project CI for these non-default options.
-
-## Note for downstream distributors of Node.js
-
-The Node.js ecosystem is reliant on ABI compatibility within a major release.
-To maintain ABI compatibility it is required that distributed builds of Node.js
-be built against the same version of dependencies, or similar versions that do
-not break their ABI compatibility, as those released by Node.js for any given
-`NODE_MODULE_VERSION` (located in `src/node_version.h`).
-
-When Node.js is built (with an intention to distribute) with an ABI
-incompatible with the official Node.js builds (e.g. using a ABI incompatible
-version of a dependency), please reserve and use a custom `NODE_MODULE_VERSION`
-by opening a pull request against the registry available at
-<https://github.com/nodejs/node/blob/HEAD/doc/abi_version_registry.json>.
-
-[Developer Mode]: https://learn.microsoft.com/en-us/windows/advanced-settings/developer-mode
+[Python versions]: https://devguide.python.org/versions/#supported-versions
 [Python downloads]: https://www.python.org/downloads/
-[Python versions]: https://devguide.python.org/versions/
 [Using Python on Windows]: https://docs.python.org/3/using/windows.html

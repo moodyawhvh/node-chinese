@@ -1,725 +1,254 @@
-# Security
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
+>
+> ⚠️ 说明:本文件篇幅超过 10000 字符,此处仅翻译核心章节(漏洞报告流程、披露政策、威胁模型与判定标准、安全更新获取等)。文末各安全团队成员名单及部分细节案例请参阅[英文原版](https://github.com/nodejs/node/blob/HEAD/SECURITY.md)。
 
-## Reporting a bug in Node.js
+# 安全(Security)
 
-Report security bugs in Node.js via [HackerOne](https://hackerone.com/nodejs).
+## 报告 Node.js 的缺陷
 
-Normally, your report will be acknowledged within 5 days, and you'll receive
-a more detailed response to your report within 10 days indicating the
-next steps in handling your submission. These timelines may extend when
-our triage volunteers are away on holiday, particularly at the end of the
-year.
+请通过 [HackerOne](https://hackerone.com/nodejs) 报告 Node.js 的安全缺陷。
 
-After the initial reply to your report, the security team will endeavor to keep
-you informed of the progress being made towards a fix and full announcement,
-and may ask for additional information or guidance surrounding the reported
-issue.
+通常,你的报告会在 5 天内得到确认,并在 10 天内收到更详细的回复,说明后续处理步骤。当分诊志愿者休假(尤其是年末)时,上述时限可能延长。
 
-If you do not receive an acknowledgement of your report within 6 business
-days, or if you cannot find a private security contact for the project, you
-may escalate to the OpenJS Foundation CNA at `security@lists.openjsf.org`.
+在对你报告的首次回复之后,安全团队会尽力让你了解修复与完整公告的进展,并可能就所报告的问题向你索取更多信息或指导。
 
-If the project acknowledges your report but does not provide any further
-response or engagement within 14 days, escalation is also appropriate.
+如果在 6 个工作日内未收到对报告的确认,或你找不到该项目的私密安全联系方式,可以升级上报至 OpenJS Foundation CNA:`security@lists.openjsf.org`。
 
-### Node.js bug bounty program
+如果项目确认了你的报告,但在 14 天内没有任何进一步回应或互动,同样可以进行升级上报。
 
-The Node.js project no longer has a bug bounty program.
+### Node.js 漏洞赏金计划
 
-## Reporting a bug in a third-party module
+Node.js 项目已不再设有漏洞赏金计划。
 
-Security bugs in third-party modules should be reported to their respective
-maintainers.
+## 报告第三方模块的缺陷
 
-## Disclosure policy
+第三方模块的安全缺陷应报告给相应模块的维护者。
 
-Here is the security disclosure policy for Node.js
+## 披露政策
 
-* The security report is received and is assigned a primary handler. This
-  person will coordinate the fix and release process. The problem is validated
-  against all supported Node.js versions. Once confirmed, a list of all affected
-  versions is determined. Code is audited to find any potential similar
-  problems. Fixes are prepared for all supported releases.
-  These fixes are not committed to the public repository but rather held locally
-  pending the announcement.
+以下是 Node.js 的安全披露政策:
 
-* A suggested embargo date for this vulnerability is chosen and a CVE (Common
-  Vulnerabilities and Exposures (CVE®)) is requested for the vulnerability.
+* 收到安全报告后,会指派一名主要负责人负责协调修复与发布流程。问题会在所有受支持的 Node.js 版本上进行验证;确认后,确定所有受影响版本的清单,并审计代码以排查类似的潜在问题。随后为所有受支持的发布线准备修复。这些修复不会提交到公开仓库,而是在本地保留,等待公告发布。
 
-* On the embargo date, a copy of the announcement is sent to the Node.js
-  security mailing list. The changes are pushed to the public repository and new
-  builds are deployed to nodejs.org. Within 6 hours of the mailing list being
-  notified, a copy of the advisory will be published on the Node.js blog.
+* 为该漏洞选定一个建议的禁运(embargo)日期,并为漏洞申请 CVE(Common Vulnerabilities and Exposures (CVE®))编号。
 
-* Typically, the embargo date will be set 72 hours from the time the CVE is
-  issued. However, this may vary depending on the severity of the bug or
-  difficulty in applying a fix.
+* 到了禁运日期,公告副本会发送到 Node.js 安全邮件列表;修复推送到公开仓库,新构建部署到 nodejs.org。邮件列表通知后的 6 小时内,公告会发布在 Node.js 官方博客上。
 
-* This process can take some time, especially when we need to coordinate with
-  maintainers of other projects. We will try to handle the bug as quickly as
-  possible; however, we must follow the release process above to ensure that we
-  handle disclosure consistently.
+* 通常,禁运日期设在 CVE 签发后 72 小时。具体可能因缺陷严重程度或修复难度而调整。
 
-## Code of Conduct and Vulnerability Reporting Guidelines
+* 整个流程可能耗时较长,尤其是需要与其他项目的维护者协调时。我们会尽快处理,但必须遵循上述发布流程,以保证披露方式的一致性。
 
-When reporting security vulnerabilities, reporters must adhere to the following guidelines:
+## 行为准则与漏洞报告准则
 
-1. **Code of Conduct Compliance**: All security reports must comply with our
-   [Code of Conduct](CODE_OF_CONDUCT.md). Reports that violate our code of conduct
-   will not be considered and may result in being banned from future participation.
+报告安全漏洞时,报告者必须遵守以下准则:
 
-2. **No Harmful Actions**: Security research and vulnerability reporting must not:
-   * Cause damage to running systems or production environments.
-   * Disrupt Node.js development or infrastructure.
-   * Affect other users' applications or systems.
-   * Include actual exploits that could harm users.
-   * Involve social engineering or phishing attempts.
+1. **遵守行为准则**:所有安全报告必须符合我们的[行为准则](CODE_OF_CONDUCT.md)。违反准则的报告将不予受理,并可能导致被禁止参与后续活动。
 
-3. **Responsible Testing**: When testing potential vulnerabilities:
-   * Use isolated, controlled environments.
-   * Do not test on production systems without prior authorization. Contact
-     the Node.js Technical Steering Committee (<tsc@iojs.org>) for permission or open
-     a HackerOne report.
-   * Do not attempt to access or modify other users' data.
-   * Immediately stop testing if unauthorized access is gained accidentally.
+2. **禁止有害行为**:安全研究与漏洞报告不得:
+   * 对运行中的系统或生产环境造成损害。
+   * 干扰 Node.js 的开发或基础设施。
+   * 影响其他用户的应用或系统。
+   * 包含可能伤害用户的真实攻击代码。
+   * 涉及社会工程或钓鱼尝试。
 
-4. **Report Quality**
-   * Provide clear, detailed steps to reproduce the vulnerability.
-   * Include reproducible code written in JavaScript.
-   * Include only the minimum proof of concept required to demonstrate the issue.
-   * Remove any malicious payloads or components that could cause harm.
-
-Failure to follow these guidelines may result in:
-
-* Rejection of the vulnerability report.
-* Forfeiture of any potential bug bounty.
-* Temporary or permanent ban from the bug bounty program.
-* Legal action in cases of malicious intent.
-
-## The Node.js threat model
-
-In the Node.js threat model, there are trusted elements such as the
-underlying operating system. Vulnerabilities that require the compromise
-of these trusted elements are outside the scope of the Node.js threat
-model.
-
-For a vulnerability to be eligible for a bug bounty, it must be a
-vulnerability in the context of the Node.js threat model. In other
-words, it cannot assume that a trusted element (such as the operating
-system) has been compromised.
-
-### Experimental platforms
-
-Node.js maintains a tier-based support system for operating systems and
-hardware combinations (Tier 1, Tier 2, and Experimental). For platforms
-classified as "Experimental" in the [supported platforms](BUILDING.md#supported-platforms)
-documentation:
-
-* Security vulnerabilities that only affect experimental platforms will **not** be accepted as valid security issues.
-* Any issues on experimental platforms will be treated as normal bugs.
-* No CVEs will be issued for issues that only affect experimental platforms
-* Bug bounty rewards are not available for experimental platform-specific issues
-
-This policy recognizes that experimental platforms may not compile, may not
-pass the test suite, and do not have the same level of testing and support
-infrastructure as Tier 1 and Tier 2 platforms.
-
-### Experimental features behind compile-time flags, experimental runtime flags, and V8 flags
-
-Node.js includes certain experimental features that are only available when
-Node.js is compiled with specific flags or that are only enabled with experimental
-runtime flags. These features are intended for development, debugging, or testing
-purposes and are not enabled or supported in official releases.
-
-Node.js may also expose V8 features that are controlled by V8 command-line flags
-(e.g., `--js-staging`, `--max_old_space_size`). These flags
-enable or modify V8-level JavaScript engine behavior that is not part of the
-ECMAScript specification that Node.js implements and is not part of the
-Node.js documented API surface.
-
-#### Runtime gated experimental features
-
-Experimental features behind runtime flags can fall into one of three
-[categories](https://github.com/nodejs/node/blob/main/doc/api/documentation.md?rgh-link-date=2026-08-21T20%3A28%3A33.000Z#stability-index):
-
-* 1.0 - Early development.
-* 1.1 - Active development.
-* 1.2 - Release candidate.
-
-Security vulnerabilities that only affect experimental features in either the
-1.0 or 1.1 stages, and that are gated with an `--experimental-*` runtime flag
-requiring explicit opt-in by the user to enable, will **not** be accepted as
-valid security issues unless the vulnerability can be exploited in a way that
-impacts the security of a stable feature when the associated `--experimental-*`
-flag is **not enabled**.
-
-Security vulnerabilities that affect experimental features in the 1.2 stage are
-acceptable as valid security issues.
-
-#### Compile-time gated experimental features and V8 flags
-
-* Security vulnerabilities that only affect features behind compile-time flags
-  or V8 flags _that are not enabled by default_ will **not** be accepted as valid
-  security issues.
-* Any issues with these features will be treated as normal bugs.
-* No CVEs will be issued for issues that only affect compile-time flag or V8 flag features.
-* Bug bounty rewards are not available for compile-time flag or V8 flag feature issues.
-
-This policy recognizes that experimental features behind compile-time flags
-are not ready for public consumption and may have incomplete implementations,
-missing security hardening, or other limitations that make them unsuitable
-for production use. Similarly, V8 flags expose internal V8 engine options that
-are not part of the Node.js documented API surface, are not enabled by
-default in production builds, and may have incomplete implementations or
-missing security hardening.
-
-### Security triage dispositions
-
-When triaging a report, the project classifies it into one of the following
-dispositions:
-
-* **Vulnerability**: A Node.js defect that is exploitable across a
-  Node.js-owned security boundary and meets the criteria under
-  [What constitutes a vulnerability](#what-constitutes-a-vulnerability),
-  including any applicable DoS criteria.
-* **Security-interest bug**: A real Node.js defect, or an API behavior likely
-  to cause security bugs in applications, that is not itself a vulnerability
-  under this threat model. These are fixed as regular bugs and do not
-  automatically receive a CVE, but should still be reported privately first
-  when they affect a common security control such as protocol interpretation,
-  permission enforcement, or certificate/TLS decisions.
-* **Common bug**: A correctness, robustness, or crash issue without a
-  Node.js-owned security boundary or a realistic cross-boundary attacker benefit.
-* **Invalid / out of scope**: A bug report that meets one of these criteria:
-  * Cannot be reproduced
-  * Is not a Node.js defect (e.g., an application bug)
-  * Is excluded by policy (e.g., experimental features)
-
-### What constitutes a vulnerability
-
-Being able to cause the following through control of the elements that Node.js
-does not trust is considered a vulnerability:
-
-* Disclosure or loss of integrity or confidentiality of data protected through
-  the correct use of Node.js APIs.
-* The unavailability of the runtime, including the unbounded degradation of its
-  performance.
-
-If Node.js loads configuration files or runs code by default (without a
-specific request from the user), and this is not documented, it is considered a
-vulnerability.
-Vulnerabilities related to this case may be fixed by a documentation update.
-
-#### Denial of Service (DoS) vulnerabilities
-
-For a behavior to be considered a DoS vulnerability, the PoC must meet the following criteria:
-
-* The API is being correctly used.
-* The API doesn't have a warning against its usage in a production environment.
-* The API is public and documented. If the API comes from JavaScript, the behavior must be
-  well-defined in the [ECMAScript specification](https://tc39.es/ecma262/).
-* The API has stable (2.0) status.
-* The behavior is significant enough to cause a denial of service quickly
-  or in a context not controlled by the Node.js application developer (for example, HTTP parsing).
-* The behavior is directly exploitable by an untrusted source without requiring application mistakes.
-* The behavior cannot be reasonably mitigated through standard operational practices (like process recycling).
-* The behavior occurs deterministically under normal usage patterns rather than edge cases.
-* The behavior occurs at a rate that would cause practical resource exhaustion within a practical timeframe under
-  typical workloads.
-* The attack demonstrates [asymmetric resource consumption](https://cwe.mitre.org/data/definitions/405.html),
-  where the attacker expends significantly fewer resources than what's required by the server to process the
-  attack. Attacks requiring comparable resources on the attacker's side (which can be mitigated through common
-  practices like rate limiting) may not qualify.
-
-**Node.js does NOT trust**:
-
-* Data received from the remote end of inbound network connections
-  that are accepted through the use of Node.js APIs and
-  which is transformed/validated by Node.js before being passed
-  to the application. This includes:
-  * HTTP APIs (all flavors) server APIs.
-* The data received from the remote end of outbound network connections
-  that are created through the use of Node.js APIs and
-  which is transformed/validated by Node.js before being passed
-  to the application **except** with respect to payload length. Node.js trusts
-  that applications make connections/requests which will avoid payload
-  sizes that will result in a Denial of Service.
-  * HTTP APIs (all flavors) client APIs.
-  * DNS APIs.
-* Consumers of data protected through the use of Node.js APIs (for example,
-  people who have access to data encrypted through the Node.js crypto APIs).
-* The file content or other I/O that is opened for reading or writing by the
-  use of Node.js APIs (ex: stdin, stdout, stderr).
-
-In other words, if the data passing through Node.js to/from the application
-can trigger actions other than those documented for the APIs, there is likely
-a security vulnerability. Examples of unwanted actions are polluting globals,
-causing an unrecoverable crash, or any other unexpected side effects that can
-lead to a loss of confidentiality, integrity, or availability.
-
-For example, if trusted input (like secure application code) is correct,
-then untrusted input must not lead to arbitrary JavaScript code execution.
-
-**Node.js trusts everything else**. Examples include:
-
-* The developers and infrastructure that run it.
-* The operating system that Node.js is running under and its configuration,
-  along with anything under the control of the operating system.
-* The deployment network environment for the privacy of traffic and routing
-  decisions, including internal networks through which Node.js traffic passes
-  and configured HTTP(S) proxy servers. Built-in proxy support is intended to
-  route traffic through proxies authorized for the deployment, often because a
-  firewall requires one to access external networks. It is not intended to hide
-  traffic from network operators or authorities governing the deployment.
-  Untrusted or unauthorized proxies, as well as deployment policy or legal
-  compliance controls around proxy use, are the responsibility of the deployment
-  operator and are outside this threat model. This does not change that data
-  parsed from network protocol peers is untrusted as described above.
-* The code it is asked to run, including JavaScript, WASM and native code, even
-  if said code is dynamically loaded, e.g., all dependencies installed from the
-  npm registry or libraries loaded via `node:ffi`.
-  The code run inherits all the privileges of the execution user.
-* Inputs provided to it by the code it is asked to run, as it is the
-  responsibility of the application to perform the required input validations,
-  e.g. the input to `JSON.parse()`.
-* Any connection used for inspector (debugger protocol) regardless of being
-  opened by command line options or Node.js APIs, and regardless of the remote
-  end being on the local machine or remote.
-* The file system when requiring a module.
-  See <https://nodejs.org/api/modules.html#all-together>.
-* The `node:wasi` module does not currently provide the comprehensive file
-  system security properties provided by some WASI runtimes.
-* The execution path is trusted. Additionally, Node.js path manipulation functions
-  such as `path.join()` and `path.normalize()` trust their input. Reports about issues
-  related to these functions that rely on unsanitized input are not considered vulnerabilities
-  requiring CVEs, as it's the user's responsibility to sanitize path inputs according to
-  their security requirements.
-
-Any unexpected behavior from the data manipulation from Node.js Internal
-functions may be considered a vulnerability if they are exploitable via
-untrusted resources.
-
-In addition to addressing vulnerabilities based on the above, the project works
-to avoid APIs and internal implementations that make it "easy" for application
-code to use the APIs incorrectly in a way that results in vulnerabilities within
-the application code itself. While we don’t consider those vulnerabilities in
-Node.js itself and will not necessarily issue a CVE, we do want them to be
-reported privately to Node.js first.
-We often choose to work to improve our APIs based on those reports and issue
-fixes either in regular or security releases depending on how much of a risk to
-the community they pose.
-
-### Examples of vulnerabilities
-
-#### Improper Certificate Validation (CWE-295)
-
-* Node.js provides APIs to validate handling of Subject Alternative Names (SANs)
-  in certificates used to connect to a TLS/SSL endpoint. If certificates can be
-  crafted that result in incorrect validation by the Node.js APIs that is
-  considered a vulnerability.
-
-#### Inconsistent Interpretation of HTTP Requests (CWE-444)
-
-* Node.js provides APIs to accept HTTP connections. Those APIs parse the
-  headers received for a connection and pass them on to the application.
-  Bugs in parsing those headers which can result in request smuggling are
-  considered vulnerabilities.
-
-#### Missing Cryptographic Step (CWE-325)
-
-* Node.js provides APIs to encrypt data. Bugs that would allow an attacker
-  to get the original data without requiring the decryption key are
-  considered vulnerabilities.
-
-#### External Control of System or Configuration Setting (CWE-15)
-
-* If Node.js automatically loads a configuration file that is not documented
-  and modification of that configuration can affect the confidentiality of
-  data protected using the Node.js APIs, then this is considered a vulnerability.
-
-### Examples of non-vulnerabilities
-
-#### Defense-in-depth issues
-
-* Bugs whose fixes would only improve resilience after another security
-  boundary has already failed, or reduce the impact of an issue outside the
-  Node.js threat model, are considered defense-in-depth issues.
-* Defense-in-depth issues are never treated as Node.js security vulnerabilities,
-  do not receive CVEs, and are handled as regular bugs or hardening improvements.
-
-#### Malicious protocol peers
-
-* Node.js treats data from remote network peers as untrusted, and bugs in
-  parsers or protocol implementations may be security vulnerabilities.
-* Node.js treats data from HTTP/1.1 keep-alive connections as trusted, meaning that a Node.js
-  client consuming unsolicited or misordered responses within the same HTTP/1.1 connection
-  reuse lifecycle are generally not considered Node.js vulnerabilities.
-
-#### Unauthorized or untrusted HTTP proxy deployments
-
-* Built-in HTTP proxy support is intended for routing outbound requests through
-  a proxy authorized by the deployment, for example because a firewall requires
-  one to reach external networks. It is not an anonymity, traffic-hiding, or
-  policy-evasion feature.
-* Reports that depend on using an unauthorized proxy, expecting Node.js to
-  provide privacy from a configured proxy or internal network, or expecting
-  Node.js to enforce deployment-specific network policy or legal requirements
-  are not considered Node.js vulnerabilities. Deployment operators are
-  responsible for hardening such environments and controlling which proxy
-  settings are allowed.
-
-#### Malicious Third-Party Modules (CWE-1357)
-
-* Code is trusted by Node.js. Therefore any scenario that requires a malicious
-  third-party module cannot result in a vulnerability in Node.js.
-
-#### Same-process self-harm
-
-* Node.js trusts the code it is asked to run. A defect that can only be
-  triggered by JavaScript, WASM, native, addon, FFI, or dependency code already
-  executing in the target process is not a Node.js vulnerability merely because
-  that code can crash, corrupt, or confuse the process it already controls.
-  This includes forging an internal handle, reflecting or overwriting an
-  internal `Symbol()`, installing a `Symbol.hasInstance` hook, or reaching into
-  an internal binding.
-* Such issues may still be fixed as common bugs. They become vulnerabilities
-  only if the same defect is reachable from an element Node.js does not trust
-  without relying on an application-created boundary.
-
-#### Prototype Pollution Attacks (CWE-1321)
-
-* Node.js trusts the inputs provided to it by application code.
-  It is up to the application to sanitize appropriately. Therefore any scenario
-  that requires control over user input is not considered a vulnerability.
-
-#### Uncontrolled Search Path Element (CWE-427)
-
-* Node.js trusts the file system in the environment accessible to it.
-  Therefore, it is not a vulnerability if it accesses/loads files from any path
-  that is accessible to it.
-
-#### External Control of System or Configuration Setting (CWE-15)
-
-* If Node.js automatically loads a configuration file that is documented,
-  no scenario that requires modification of that configuration file is
-  considered a vulnerability.
-
-#### Uncontrolled Resource Consumption (CWE-400) on outbound connections
-
-* If Node.js is asked to connect to a remote site and return an
-  artifact, it is not considered a vulnerability if the size of
-  that artifact is large enough to impact performance or
-  cause the runtime to run out of resources.
-
-#### Vulnerabilities affecting software downloaded by Corepack
-
-* Corepack defaults to downloading the latest version of the software requested
-  by the user, or a specific version requested by the user. For this reason,
-  Node.js releases won't be affected by such vulnerabilities. Users are
-  responsible for keeping the software they use through Corepack up-to-date.
-
-#### Exposing Application-Level APIs to Untrusted Users (CWE-653)
-
-* Node.js trusts the application code that uses its APIs. When application code
-  exposes Node.js functionality to untrusted users in an unsafe manner, any
-  resulting crashes, data corruption, or other issues are not considered
-  vulnerabilities in Node.js itself. It is the application's responsibility to:
-  * Validate and sanitize all untrusted input before passing it to Node.js APIs.
-  * Design appropriate access controls and security boundaries.
-  * Avoid exposing low-level or dangerous APIs directly to untrusted users.
-
-* Examples of scenarios that are **not** Node.js vulnerabilities:
-  * Allowing untrusted users to register SQLite user-defined functions via
-    `node:sqlite` (`DatabaseSync`) that can perform arbitrary operations
-    (e.g., closing database connections during query execution, causing crashes
-    or use-after-free conditions).
-  * Loading SQLite extensions using the `allowExtension` option in
-    `DatabaseSync` — this option must be explicitly set to `true` by the
-    application, and enabling it is the application operator's responsibility.
-  * Using `node:sqlite` built-in SQL functions or pragmas (e.g.,
-    `ATTACH DATABASE`) to read or write files — `DatabaseSync` operates with
-    the same file-system access as the process itself, and it is the
-    application's responsibility to restrict what SQL is executed.
-  * Exposing `child_process.exec()` or similar APIs to untrusted users without
-    proper input validation, allowing command injection.
-  * Allowing untrusted users to control file paths passed to file system APIs
-    without validation, leading to path traversal issues.
-  * Permitting untrusted users to define custom code that executes with the
-    application's privileges (e.g., custom transforms, plugins, or callbacks).
-
-* These scenarios represent application-level security issues, not Node.js
-  vulnerabilities. The root cause is the application's failure to establish
-  proper security boundaries between trusted application logic and untrusted
-  user input.
-
-#### Build System Attacks Requiring Control of the Build Environment (CWE-78, CWE-114, CWE-276)
-
-* The Node.js build system (e.g., `configure`, `configure.py`, `Makefile`,
-  `vcbuild.bat`) is designed to run in a trusted build environment.
-  The build environment, including environment variables, the file system,
-  and locally installed tools, is a trusted element in the Node.js threat model.
-* Reports about command injection via environment variables in build scripts
-  (e.g., `CC`, `CXX`, `PKG_CONFIG`, `RUSTC`), path hijacking in build output
-  directories, or file permissions of build artifacts are **not** considered
-  vulnerabilities. These scenarios require the attacker to already have control
-  over the build environment, which means the system is already compromised.
-* Build scripts are not a security boundary. They are expected to execute
-  tools and scripts specified by the environment, and to trust the
-  file system they operate on.
-
-#### Unhandled 'error' Events on EventEmitters (CWE-248)
-
-* EventEmitters that can emit `'error'` events require the application to
-  attach an `'error'` event handler. This includes HTTP streams and other
-  Node.js core streams. If the application fails to attach an `'error'`
-  handler, the EventEmitter will throw an uncaught exception, which may
-  crash the process.
-* Crashes resulting from missing `'error'` handlers are not considered
-  denial-of-service vulnerabilities in Node.js. It is the application's
-  responsibility to properly handle errors by attaching appropriate
-  `'error'` event listeners to EventEmitters that may emit errors.
-
-#### Exceptions Thrown by Application Callbacks (CWE-248)
-
-* Node.js trusts the application code it is asked to run, including callbacks
-  that are invoked by Node.js APIs. If an application callback throws an
-  uncaught exception, any resulting crash is not considered a vulnerability in
-  Node.js.
-* For example, [CVE-2026-21637](https://www.cve.org/CVERecord?id=CVE-2026-21637)
-  was triaged as a Node.js vulnerability, but scenarios that require TLS
-  callbacks such as `ALPNCallback`, `SNICallback`, or `pskCallback` to throw
-  are outside the Node.js threat model. Future reports of similar issues,
-  where the crash depends on application callbacks throwing uncaught
-  exceptions, will not be treated as Node.js vulnerabilities. It is the
-  application's responsibility to handle unexpected callback input and report
-  errors without throwing uncaught exceptions.
-
-#### Permission Model Boundaries (`--permission`)
-
-The Node.js [Permission Model](https://nodejs.org/api/permissions.html)
-(`--permission`) is an opt-in mechanism that limits which
-resources a Node.js process may access. It is designed to reduce the blast
-radius of mistakes in trusted application code, **not** to act as a security
-boundary against intentional misuse or a compromised process.
-
-Permission Model reports are triaged in three lanes:
-
-* **Vulnerability**: An element Node.js does not trust crosses a Node.js-owned
-  permission check without trusted code already executing in the protected
-  process.
-* **Security-interest bug**: Trusted application code uses documented, stable
-  APIs as intended, but Node.js fails to enforce a documented permission
-  invariant consistently — for example, one API enforces a check that an
-  equivalent API omits. These are fixed as hardening and are not automatically
-  CVE-class, because the Permission Model is not a sandbox against malicious
-  same-process code.
-* **Excluded**: Intentional misuse by code already running in the process,
-  operator-selected flags, a modified `execArgv`/`env`, or any expectation that
-  the Permission Model sandboxes malicious same-process code.
-
-The following are **not** vulnerabilities in Node.js:
-
-* **Operator-controlled flags**: Behavior unlocked by flags the operator
-  explicitly passes (e.g., `--localstorage-file`) is the operator's
-  responsibility. The permission model does not restrict how Node.js behaves
-  when the operator intentionally configures it.
-
-* **`node:sqlite` and the permission model**: `DatabaseSync` operates with the
-  same file-system privileges as the process. Using SQL pragmas or built-in
-  SQLite mechanisms (e.g., `ATTACH DATABASE`) to access files does not bypass
-  the permission model — the permission model does not intercept SQL-level
-  file operations.
-
-* **Path resolution and symlinks**: `fs.realpathSync()`, `fs.realpath()`, and
-  similar functions resolve a path to its canonical form before the permission
-  check is applied. Accessing a file through a symlink that resolves to an
-  allowed path is the intended behavior, not a bypass. TOCTOU races on
-  symlinks that resolve within the allowed list are similarly not considered
-  permission model bypasses.
-
-* **`worker_threads` and the permission model**: Creating a worker is gated by
-  `--allow-worker`. A worker started with a modified `execArgv` or `env` may
-  start without inheriting the parent's permission configuration, so the
-  permission model does not reliably propagate to such workers. Because worker
-  creation already requires `--allow-worker`, and the Permission Model is not a
-  sandbox against intentional misuse by trusted code, this is not considered a
-  vulnerability. Applications that rely on the Permission Model must not grant
-  `--allow-worker` to code they do not trust.
-
-#### QUIC and HTTP/3
-
-The experimental QUIC and HTTP/3 implementation in Node.js is a complex new
-protocol stack and API that is still under active development and should not be
-used for production workloads. Reports that only affect QUIC or HTTP/3 are not
-considered Node.js vulnerabilities at this time. It is expected that the QUIC
-and HTTP/3 implementation will continue to evolve, and security issues will be
-addressed as the implementation matures.
-
-#### Virtual File System (`node:vfs`)
-
-The experimental [Virtual File System](https://nodejs.org/api/vfs.html)
-(`node:vfs`) is a virtualized file-system API for tests, fixtures, embedded
-assets, and application-managed storage. It is **not** a sandbox, permission
-system, or security boundary for untrusted code.
-
-Code that can load `node:vfs`, receive a `VirtualFileSystem` instance, install a
-mount, choose a provider, or pass paths to VFS APIs is trusted application code.
-A VFS mount only redirects matching file-system calls; it does not hide or
-restrict access to the host file system. `RealFSProvider` root checks and
-read-only providers are implementation behavior, not security guarantees.
-
-Reports that rely on using VFS to isolate untrusted JavaScript, native code, or
-user-controlled paths are not considered Node.js vulnerabilities. Use OS-level
-isolation, such as separate users, containers, or platform sandboxes, when a
-security boundary is required.
-
-#### V8 Sandbox
-
-The V8 sandbox is an in-process isolation mechanism internal to V8 that is not
-a Node.js security boundary. Node.js does not guarantee or document the V8
-sandbox as a security feature, and it is not enabled in a way that provides
-security guarantees in production Node.js builds. Reports about escaping the V8
-sandbox are not considered Node.js vulnerabilities; they should be reported
-directly to the [V8 project](https://v8.dev/docs/security-bugs).
-
-#### CRLF Injection in `writeEarlyHints()`
-
-`ServerResponse.writeEarlyHints()` accepts a `link` header value that is set
-by the application. Passing arbitrary strings, including CRLF sequences, as
-the `link` value is an application-level misuse of the API, not a Node.js
-vulnerability. Node.js validates the structure of Early Hints per the HTTP spec
-but does not sanitize free-form application data passed to it; that is the
-application's responsibility.
-
-## Receiving security updates
-
-Security notifications will be distributed via the following methods.
+3. **负责任的测试**:测试潜在漏洞时:
+   * 使用隔离、受控的环境。
+   * 未经事先授权,不得在生产系统上测试。可联系 Node.js 技术指导委员会(<tsc@iojs.org>)获取许可,或发起 HackerOne 报告。
+   * 不得尝试访问或修改其他用户的数据。
+   * 一旦意外获得未授权访问,立即停止测试。
+
+4. **报告质量**
+   * 提供清晰、详细的漏洞复现步骤。
+   * 附上可复现的 JavaScript 代码。
+   * 只包含演示问题所需的最小概念验证(PoC)。
+   * 移除任何可能造成危害的恶意载荷或组件。
+
+不遵守上述准则可能导致:报告被拒绝、丧失潜在的赏金、被暂时或永久禁止参与赏金计划,以及恶意情形下的法律追诉。
+
+## Node.js 威胁模型
+
+在 Node.js 威胁模型中,存在受信任的要素,例如底层操作系统。需要先攻破这些受信任要素才能成立的漏洞,不在 Node.js 威胁模型范围之内。
+
+一个漏洞要有资格获得漏洞赏金,必须是 Node.js 威胁模型语境下的漏洞。换句话说,它不能以"受信任要素(如操作系统)已被攻破"为前提。
+
+### 实验性平台
+
+Node.js 对操作系统与硬件组合实行分级支持体系(Tier 1、Tier 2 和 Experimental)。对于在[支持平台](BUILDING.md#supported-platforms)文档中被归为 "Experimental" 的平台:
+
+* 仅影响实验性平台的安全漏洞**不会**被认定为有效安全问题。
+* 实验性平台上的任何问题都按普通缺陷处理。
+* 仅影响实验性平台的问题不会签发 CVE。
+* 实验性平台特有问题不提供赏金奖励。
+
+该政策承认:实验性平台可能无法编译、可能无法通过测试套件,也不具备与 Tier 1/Tier 2 平台同等的测试与支持基础设施。
+
+### 受编译期旗标、实验性运行时旗标及 V8 旗标限制的实验性特性
+
+Node.js 包含一些实验性特性,只有在以特定旗标编译时才可用,或需要实验性运行时旗标才能启用。这些特性面向开发、调试或测试用途,官方发布版不默认启用也不提供支持。
+
+Node.js 还可能暴露由 V8 命令行旗标控制的 V8 特性(如 `--js-staging`、`--max_old_space_size`)。这些旗标启用或修改的是 V8 层面的 JavaScript 引擎行为,不属于 Node.js 实现的 ECMAScript 规范,也不属于 Node.js 的文档化 API 面。
+
+#### 运行时门控的实验性特性
+
+受运行时旗标限制的实验性特性可分为三个[稳定度类别](https://github.com/nodejs/node/blob/main/doc/api/documentation.md#stability-index):
+
+* 1.0 - 早期开发。
+* 1.1 - 积极开发。
+* 1.2 - 发布候选。
+
+仅影响 1.0 或 1.1 阶段、且由需要用户显式选择加入的 `--experimental-*` 运行时旗标门控的实验性特性的安全漏洞,**不会**被认定为有效安全问题——除非在该 `--experimental-*` 旗标**未启用**的情况下,该漏洞仍能以影响稳定特性安全的方式被利用。
+
+影响 1.2 阶段实验性特性的安全漏洞可以被认定为有效安全问题。
+
+#### 编译期门控的实验性特性与 V8 旗标
+
+* 仅影响默认未启用的编译期旗标特性或 V8 旗标特性的安全漏洞,**不会**被认定为有效安全问题。
+* 这些特性的任何问题都按普通缺陷处理。
+* 仅影响编译期旗标或 V8 旗标特性的问题不会签发 CVE。
+* 编译期旗标或 V8 旗标特性问题不提供赏金奖励。
+
+### 安全分诊结论
+
+分诊报告时,项目会将其归入以下结论之一:
+
+* **漏洞(Vulnerability)**:可跨越 Node.js 自有安全边界利用的 Node.js 缺陷,满足[什么构成漏洞](#什么构成漏洞)中的标准,包括适用的 DoS 标准。
+* **安全关注缺陷(Security-interest bug)**:真实存在的 Node.js 缺陷,或容易在应用中引发安全缺陷的 API 行为,但按本威胁模型不构成漏洞。此类问题作为普通缺陷修复,不自动签发 CVE;但若涉及协议解析、权限强制、证书/TLS 判定等通用安全控制,仍应先私下报告。
+* **普通缺陷(Common bug)**:不涉及 Node.js 自有安全边界、也不存在现实的跨边界攻击者收益的正确性、健壮性或崩溃问题。
+* **无效/超出范围(Invalid / out of scope)**:满足以下任一条件的报告:无法复现;不是 Node.js 的缺陷(例如应用自身的缺陷);被政策排除(例如实验性特性)。
+
+### 什么构成漏洞
+
+通过控制 Node.js 不信任的要素,能够造成以下后果的,即视为漏洞:
+
+* 通过正确使用 Node.js API 而受保护的数据,其机密性或完整性遭到泄露或破坏。
+* 运行时不可用,包括其性能的无界退化。
+
+如果 Node.js 默认(在用户没有明确要求的情况下)加载配置文件或运行代码,且该行为没有文档说明,则视为漏洞。此类漏洞可能通过更新文档来修复。
+
+#### 拒绝服务(DoS)漏洞
+
+一个行为要被认定为 DoS 漏洞,PoC 必须满足以下标准:
+
+* API 得到了正确使用。
+* 该 API 没有针对生产环境使用发出警告。
+* 该 API 是公开且有文档的。若 API 来自 JavaScript,其行为必须在 [ECMAScript 规范](https://tc39.es/ecma262/)中有明确界定。
+* 该 API 处于稳定(2.0)状态。
+* 该行为严重到足以快速造成拒绝服务,或发生在 Node.js 应用开发者无法控制的上下文中(例如 HTTP 解析)。
+* 该行为可被不可信来源直接利用,不依赖应用自身的失误。
+* 该行为无法通过标准运维手段(如进程回收)得到合理缓解。
+* 该行为在正常使用模式下确定性出现,而非只出现在边缘情况。
+* 在典型负载下,该行为出现的速度足以在现实时间内造成实际的资源耗尽。
+* 攻击展现出[不对称的资源消耗](https://cwe.mitre.org/data/definitions/405.html):攻击者付出的资源显著少于服务器处理攻击所需。攻击方需要相当资源的攻击(可通过限流等常见手段缓解)可能不符合条件。
+
+**Node.js 不信任**:
+
+* 通过 Node.js API 接受的入站网络连接远端传来的、由 Node.js 转换/校验后才交给应用的数据,包括:
+  * HTTP API(所有形态)的服务端 API。
+* 通过 Node.js API 建立的出站网络连接远端传来的、由 Node.js 转换/校验后才交给应用的数据,**但载荷长度除外**。Node.js 信任应用会自行避免发起会导致 DoS 的超大载荷请求/连接。
+  * HTTP API(所有形态)的客户端 API。
+  * DNS API。
+* 使用 Node.js API 保护的数据的消费方(例如能接触到经 Node.js crypto API 加密的数据的人)。
+* 通过 Node.js API 打开以进行读写的文件内容或其他 I/O(如 stdin、stdout、stderr)。
+
+换言之,如果流经 Node.js 进出应用的数据能触发 API 文档之外的动作,就很可能存在安全漏洞。非预期动作包括污染全局对象、引发不可恢复的崩溃,或任何其他可能导致机密性、完整性、可用性损失的意外副作用。
+
+例如,只要受信任的输入(如安全的应用代码)是正确的,不可信输入就不得导致任意 JavaScript 代码执行。
+
+**Node.js 信任其余一切**,例如:
+
+* 运行它的开发者和基础设施。
+* Node.js 所处的操作系统及其配置,以及操作系统控制之下的一切。
+* 部署的网络环境,包括流量的私密性与路由决策、Node.js 流量经过的内部网络以及配置的 HTTP(S) 代理服务器。内置代理支持旨在将流量经由部署方授权的代理路由,通常是因为防火墙要求经代理访问外部网络;它不是用来向网络运营方或部署管辖方隐藏流量的。不可信或未经授权的代理,以及围绕代理使用的部署策略或合规控制,属于部署运营方的责任,不在本威胁模型之内。前述"网络协议对端解析出的数据不可信"的结论不因此改变。
+* 被要求运行的代码,包括 JavaScript、WASM 和原生代码,即使是动态加载的(例如从 npm registry 安装的全部依赖、经 `node:ffi` 加载的库)。被运行的代码继承执行用户的全部权限。
+* 被运行代码提供给 Node.js 的输入;执行所需的输入校验是应用自己的责任,例如传给 `JSON.parse()` 的输入。
+* 用于检查器(调试器协议)的任何连接,无论它是经命令行选项还是 Node.js API 打开,也不论远端在本机还是远程。
+* require 模块时的文件系统。参见 <https://nodejs.org/api/modules.html#all-together>。
+* `node:wasi` 模块目前不提供某些 WASI 运行时具备的完整文件系统安全属性。
+* 执行路径是受信任的。此外,`path.join()`、`path.normalize()` 等 Node.js 路径操作函数信任其输入。依赖未净化输入的此类函数问题报告,不视为需要 CVE 的漏洞;按自身安全要求净化路径输入是用户的责任。
+
+Node.js 内部函数在数据操作上出现的任何意外行为,只要可经不可信资源利用,都可能构成漏洞。
+
+除按上述标准处理漏洞外,项目也努力避免提供那些让应用代码"容易"用错、进而在应用代码内部引发漏洞的 API 与内部实现。这类问题不算 Node.js 自身的漏洞,我们不一定会签发 CVE,但仍希望先私下报告给 Node.js。我们常常会基于这些报告改进 API,并视其对社区的风险,在常规版本或安全版本中发布修复。
+
+### 漏洞示例(节译)
+
+* **证书校验不当(CWE-295)**:可构造出导致 Node.js API 校验结果错误的证书,视为漏洞。
+* **HTTP 请求解析不一致(CWE-444)**:HTTP 头解析缺陷若可造成请求走私(request smuggling),视为漏洞。
+* **缺失加密步骤(CWE-325)**:攻击者无需解密密钥即可还原原始数据的缺陷,视为漏洞。
+* **系统或配置设置的外部控制(CWE-15)**:Node.js 自动加载了未文档化的配置文件,且修改该配置可影响受 Node.js API 保护数据的机密性,视为漏洞。
+
+### 非漏洞示例(节译,详见英文原版)
+
+* **纵深防御问题**:只有在另一道安全边界已经失守后才起作用的修复,不视为 Node.js 安全漏洞,不发 CVE,按普通缺陷或加固改进处理。
+* **恶意协议对端**:Node.js 将远端网络对端数据视为不可信,解析器/协议实现缺陷可能构成漏洞;但 HTTP/1.1 keep-alive 连接内的未经请求/乱序响应一般不算。
+* **未授权或不可信的 HTTP 代理部署**:内置代理支持不是匿名、隐匿流量或规避策略的特性;依赖未授权代理或期望 Node.js 规避部署网络策略的报告不算漏洞。
+* **恶意第三方模块(CWE-1357)**:代码受 Node.js 信任,依赖恶意第三方模块的场景不构成 Node.js 漏洞。
+* **同进程自伤**:Node.js 信任其运行的代码;只有已在目标进程中执行的 JS/WASM/原生/插件/FFI/依赖代码才能触发的缺陷,不因该代码能弄崩自己已控制的进程而成为漏洞。同类缺陷若可从不可信要素触达,才成为漏洞。
+* **原型污染攻击(CWE-1321)**:应用输入的净化是应用的责任,依赖控制用户输入的场景不算漏洞。
+* **不受控的搜索路径元素(CWE-427)**:Node.js 信任其可访问环境中的文件系统,访问/加载可达路径上的文件不算漏洞。
+* **已文档化配置文件的外部控制(CWE-15)**:若自动加载的配置文件已有文档说明,修改该文件的场景不算漏洞。
+* **出站连接的资源耗尽(CWE-400)**:应用主动请求连接远端并获取产物,产物过大影响性能或耗尽资源不算漏洞。
+* **Corepack 下载软件的漏洞**:Corepack 默认下载用户要求的最新或指定版本,用户需自行保持更新。
+* **向不可信用户暴露应用级 API(CWE-653)**:应用以不安全方式向不可信用户暴露 Node.js 功能(如 `node:sqlite` 自定义函数、`child_process.exec()`、未校验的文件路径、以应用权限执行的自定义代码等)造成的问题属于应用级安全问题,不是 Node.js 漏洞。
+* **需要控制构建环境的构建系统攻击(CWE-78/CWE-114/CWE-276)**:构建环境是受信任要素;构建脚本环境变量注入、输出目录路径劫持等报告不算漏洞。
+* **EventEmitter 未处理的 `'error'` 事件(CWE-248)**:未挂 `'error'` 监听导致的崩溃不是 DoS 漏洞,正确处理错误是应用的责任。
+* **应用回调抛出的异常(CWE-248)**:应用回调抛出未捕获异常导致的崩溃不是 Node.js 漏洞(如依赖 `ALPNCallback`、`SNICallback`、`pskCallback` 抛异常的场景)。
+* **权限模型边界(`--permission`)**:权限模型是可选加入机制,旨在缩小受信应用代码失误的影响范围,**不是**对抗故意滥用或进程被攻破的安全边界。不可信要素绕过 Node.js 自有权限检查才可能算漏洞;操作者主动传入的旗标行为、修改过的 `execArgv`/`env`、`node:sqlite` 的 SQL 级文件操作、解析到允许路径的符号链接、修改 `execArgv` 启动的 worker 等,均不算漏洞。
+* **QUIC 与 HTTP/3**:实验性实现仍在积极开发,不应用于生产;仅影响 QUIC/HTTP/3 的报告目前不算 Node.js 漏洞。
+* **虚拟文件系统(`node:vfs`)**:实验性 VFS 不是沙箱、权限系统或安全边界;依赖 VFS 隔离不可信代码的报告不算漏洞,需要安全边界请使用操作系统级隔离。
+* **V8 沙箱**:V8 沙箱是 V8 进程内隔离机制,不是 Node.js 安全边界;逃逸报告应直接报告给 [V8 项目](https://v8.dev/docs/security-bugs)。
+* **`writeEarlyHints()` 中的 CRLF 注入**:应用传入含 CRLF 的 `link` 值属于应用层 API 误用,不是 Node.js 漏洞。
+
+## 接收安全更新
+
+安全通知通过以下渠道发布:
 
 * <https://groups.google.com/group/nodejs-sec>
 * <https://nodejs.org/en/blog/vulnerability>
 
-### CVE publication timeline
+### CVE 公布时间线
 
-When security releases are published, there is a built-in delay before the
-corresponding CVEs are publicly disclosed. This delay occurs because:
+安全版本发布后,对应 CVE 的公开披露存在内置延迟,原因如下:
 
-1. After the security release, we request the vulnerability reporter to disclose
-   the details on HackerOne.
-2. If the reporter does not disclose within one day, we proceed with forced
-   disclosure to publish the CVEs.
-3. The disclosure then goes through HackerOne's approval process before the CVEs
-   become publicly available.
+1. 安全版本发布后,我们会请漏洞报告者在 HackerOne 上披露细节。
+2. 若报告者一天内未披露,我们将进行强制披露以发布 CVE。
+3. 披露需经 HackerOne 的审批流程,CVE 才会公开可用。
 
-As a result, CVEs may not be immediately available when security releases are
-published, but will typically be disclosed within a few days of the release.
+因此,安全版本发布时 CVE 可能不会立即可查,但通常会在发布后几天内披露。
 
-## Comments on this policy
+## 对本政策的意见
 
-If you have suggestions on how this process could be improved, please visit
-the [nodejs/security-wg](https://github.com/nodejs/security-wg)
-repository.
+若对流程改进有建议,请访问 [nodejs/security-wg](https://github.com/nodejs/security-wg) 仓库。
 
-## Incident Response Plan
+## 事件响应计划
 
-In the event of a security incident, please refer to the
-[Security Incident Response Plan](https://github.com/nodejs/security-wg/blob/main/INCIDENT_RESPONSE_PLAN.md).
+发生安全事件时,请参阅[安全事件响应计划](https://github.com/nodejs/security-wg/blob/main/INCIDENT_RESPONSE_PLAN.md)。
 
-## Node.js Security Team
+## Node.js 安全团队
 
-Node.js security team members are expected to keep all information that they
-have privileged access to by being on the team completely private to the team.
-This includes agreeing to not notify anyone outside the team of issues that have
-not yet been disclosed publicly, including the existence of issues, expectations
-of upcoming releases, and patching of any issues other than in the process of
-their work as a member of the security team.
+Node.js 安全团队成员须对因其成员身份而获得的全部特权信息严格保密,包括承诺不向团队以外任何人通报尚未公开披露的问题——包括问题的存在、即将发布版本的预期,以及除安全团队工作流程之外的任何问题修补。
 
-### Node.js Security Team Membership Policy
+### Node.js 安全团队成员政策
 
-The Node.js Security Team has access to security-sensitive issues and patches
-that aren't appropriate for public availability.
+Node.js 安全团队可以接触不适合公开的安全敏感问题与补丁。成员政策如下:
 
-The policy for inclusion is as follows:
+1. @nodejs/TSC 的所有成员都有权访问私密安全报告与私密补丁。
+2. @nodejs/releasers 团队成员为产出发布版,有权访问私密安全补丁。
+3. 个别情况下,TSC 会邀请技术指导委员会以外的人访问私密安全报告或私密补丁,以便将其专业能力用于特定问题或补丁。该权限可为临时或永久,由 TSC 决定。
 
-1. All members of @nodejs/TSC have access to private security reports and
-   private patches.
-2. Members of the @nodejs/releasers team
-   have access to private security patches in order to produce releases.
-3. On a case-by-case basis, individuals outside the Technical Steering
-   Committee are invited by the TSC to have access to private security reports
-   or private patches so that their expertise can be applied to an issue or
-   patch. This access may be temporary or permanent, as decided by the TSC.
+## 负责分诊安全报告的团队
 
-Membership on the security teams can be requested via an issue in the TSC repo.
-
-## Team responsible for Triaging security reports
-
-The responsibility of Triage is to determine whether Node.js must take any
-action to mitigate the issue, and if so, to ensure that the action is taken.
-
-Mitigation may take many forms, for example, a Node.js security release that
-includes a fix, documentation, an informational CVE or blog post.
+分诊的职责是判定 Node.js 是否必须采取缓解行动;若需要,确保行动落实。缓解的形式多样,例如包含修复的安全版本、文档、信息性 CVE 或博客文章。
 
 * [@mcollina](https://github.com/mcollina) - Matteo Collina
 * [@RafaelGSS](https://github.com/RafaelGSS) - Rafael Gonzaga
 * [@vdeturckheim](https://github.com/vdeturckheim) - Vladimir de Turckheim
 * [@BethGriggs](https://github.com/BethGriggs) - Beth Griggs
 
-## Team with access to private security reports against Node.js
+## 可访问 Node.js 私密安全报告的团队
 
-[TSC voting members](https://github.com/nodejs/node#tsc-voting-members)
-have access.
+[TSC 投票成员](https://github.com/nodejs/node#tsc-voting-members)拥有访问权,另有若干个人成员;完整名单见[英文原版](https://github.com/nodejs/node/blob/HEAD/SECURITY.md)及 HackerOne 上 Node.js 项目的[成员页面](https://hackerone.com/organizations/nodejs/settings/users)。
 
-In addition, these individuals have access:
+## 可访问 Node.js 私密安全补丁的团队
 
-* [BethGriggs](https://github.com/BethGriggs) - **Beth Griggs**
-* [MylesBorins](https://github.com/MylesBorins) -  **Myles Borins**
-* [bengl](https://github.com/bengl)- **Bryan English**
-* [bnoordhuis](https://github.com/bnoordhuis) **Ben Noordhuis**
-* [cjihrig](https://github.com/cjihrig) **Colin Ihrig**
-* [joesepi](https://github.com/joesepi) - **Joe Sepi**
-* [juanarbol](https://github.com/juanarbol) **Juan Jose Arboleda**
-* [sxa](https://github.com/sxa) - **Stewart X Addison**
-* [ulisesgascon](https://github.com/ulisesgascon) **Ulises Gascón**
-* [vdeturckheim](https://github.com/vdeturckheim) - **Vladimir de Turckheim**
-
-The list is from the [member page](https://hackerone.com/organizations/nodejs/settings/users) for
-the Node.js program on HackerOne.
-
-## Team with access to private security patches to Node.js
-
-<!-- ncu-team-sync.team(nodejs-private/security) -->
-
-* [@aduh95](https://github.com/aduh95) - Antoine du Hamel
-* [@anonrig](https://github.com/anonrig) - Yagiz Nizipli
-* [@bengl](https://github.com/bengl) - Bryan English
-* [@benjamingr](https://github.com/benjamingr) - Benjamin Gruenbaum
-* [@BethGriggs](https://github.com/BethGriggs) - Beth Griggs
-* [@bmeck](https://github.com/bmeck) - Bradley Farias
-* [@bnoordhuis](https://github.com/bnoordhuis) - Ben Noordhuis
-* [@BridgeAR](https://github.com/BridgeAR) - Ruben Bridgewater
-* [@gireeshpunathil](https://github.com/gireeshpunathil) - Gireesh Punathil
-* [@guybedford](https://github.com/guybedford) - Guy Bedford
-* [@indutny](https://github.com/indutny) - Fedor Indutny
-* [@jasnell](https://github.com/jasnell) - James M Snell
-* [@joaocgreis](https://github.com/joaocgreis) - João Reis
-* [@joesepi](https://github.com/joesepi) - Joe Sepi
-* [@joyeecheung](https://github.com/joyeecheung) - Joyee Cheung
-* [@juanarbol](https://github.com/juanarbol) - Juan José
-* [@legendecas](https://github.com/legendecas) - Chengzhong Wu
-* [@marco-ippolito](https://github.com/marco-ippolito) - Marco Ippolito
-* [@mcollina](https://github.com/mcollina) - Matteo Collina
-* [@MoLow](https://github.com/MoLow) - Moshe Atlow
-* [@panva](https://github.com/panva) - Filip Skokan
-* [@RafaelGSS](https://github.com/RafaelGSS) - Rafael Gonzaga
-* [@richardlau](https://github.com/richardlau) - Richard Lau
-* [@ronag](https://github.com/ronag) - Robert Nagy
-* [@ruyadorno](https://github.com/ruyadorno) - Ruy Adorno
-* [@santigimeno](https://github.com/santigimeno) - Santiago Gimeno
-* [@ShogunPanda](https://github.com/ShogunPanda) - Paolo Insogna
-* [@sxa](https://github.com/sxa) - Stewart X Addison
-* [@targos](https://github.com/targos) - Michaël Zasso
-* [@tniessen](https://github.com/tniessen) - Tobias Nießen
-* [@UlisesGascon](https://github.com/UlisesGascon) - Ulises Gascón
-* [@vdeturckheim](https://github.com/vdeturckheim) - Vladimir de Turckheim
-
-<!-- ncu-team-sync end -->
+完整名单(由 ncu-team-sync 自动维护)见[英文原版](https://github.com/nodejs/node/blob/HEAD/SECURITY.md)。
