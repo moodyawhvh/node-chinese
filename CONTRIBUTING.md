@@ -1,84 +1,65 @@
-# Contributing to Node.js
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
+
+# 参与 Node.js 贡献
 
 > \[!TIP]
-> Contributing for the first time? Please read our
-> [Guide for First-Time Contributors](./doc/contributing/first-contributions.md) for tips
-> and answers to FAQs.
+> 第一次参与贡献?请阅读我们的[新人贡献者指南](./doc/contributing/first-contributions.md),里面有实用技巧和常见问题解答。
 
-Contributions to Node.js include code, documentation, answering user questions,
-running the project's infrastructure, and advocating for all types of Node.js
-users.
+对 Node.js 的贡献包括:编写代码、撰写文档、回答用户问题、维护项目基础设施,以及为各类 Node.js 用户发声。
 
-The Node.js project welcomes all contributions from anyone willing to work in
-good faith with other contributors and the community. No contribution is too
-small and all contributions are valued.
+Node.js 项目欢迎任何人以善意与其他贡献者和社区合作并做出的所有贡献。没有微不足道的贡献,每一份贡献都值得珍视。
 
-The Node.js project has an open governance model.
-Individuals making significant and valuable contributions are made
-Collaborators and given commit-access to the project. See the
-[GOVERNANCE.md](./GOVERNANCE.md) document for more information about how this
-works.
+Node.js 项目采用开放的治理模式。做出重要且有价值贡献的个人会被吸纳为协作者(Collaborator),并获得项目的提交权限。详见 [GOVERNANCE.md](./GOVERNANCE.md) 文档。
 
-## Contents
+## 目录
 
-* [Code of Conduct](#code-of-conduct)
-* [Issues](#issues)
-* [Pull Requests](#pull-requests)
-* [Automation and bots](#automation-and-bots)
-* [AI Use Policy and Guidelines](#ai-use-policy-and-guidelines)
-* [Developer's Certificate of Origin 1.1](#developers-certificate-of-origin-11)
+* [行为准则](#行为准则)
+* [Issue](#issue)
+* [Pull Request](#pull-request)
+* [自动化与机器人](#自动化与机器人)
+* [AI 使用政策与准则](#ai-使用政策与准则)
+* [开发者来源证明 1.1](#开发者来源证明-11)
 
-## [Code of Conduct](./doc/contributing/code-of-conduct.md)
+## [行为准则](./doc/contributing/code-of-conduct.md)
 
-The Node.js project has a
-[Code of Conduct](https://github.com/nodejs/admin/blob/HEAD/CODE_OF_CONDUCT.md)
-to which all contributors must adhere.
+Node.js 项目有一份[行为准则](https://github.com/nodejs/admin/blob/HEAD/CODE_OF_CONDUCT.md),所有贡献者都必须遵守。
 
-See [details on our policy on Code of Conduct](./doc/contributing/code-of-conduct.md).
+详见[行为准则相关政策说明](./doc/contributing/code-of-conduct.md)。
 
-## [Issues](./doc/contributing/issues.md)
+## [Issue](./doc/contributing/issues.md)
 
-* [Asking for General Help](./doc/contributing/issues.md#asking-for-general-help)
-* [Discussing non-technical topics](./doc/contributing/issues.md#discussing-non-technical-topics)
-* [Submitting a Bug Report](./doc/contributing/issues.md#submitting-a-bug-report)
-* [Triaging a Bug Report](./doc/contributing/issues.md#triaging-a-bug-report)
+* [寻求一般性帮助](./doc/contributing/issues.md#asking-for-general-help)
+* [讨论非技术话题](./doc/contributing/issues.md#discussing-non-technical-topics)
+* [提交缺陷报告](./doc/contributing/issues.md#submitting-a-bug-report)
+* [分诊缺陷报告](./doc/contributing/issues.md#triaging-a-bug-report)
 
-## [Pull Requests](./doc/contributing/pull-requests.md)
+## [Pull Request](./doc/contributing/pull-requests.md)
 
-Pull Requests are the way concrete changes are made to the code, documentation,
-dependencies, and tools contained in the `nodejs/node` repository.
-Contributors who are not Collaborators may have no more than 10 pull requests
-open at a time.
+Pull Request 是对 `nodejs/node` 仓库中的代码、文档、依赖和工具进行具体修改的方式。
+非协作者 Contributors 同时最多只能有 10 个处于打开状态的 pull request。
 
-* [Dependencies](./doc/contributing/pull-requests.md#dependencies)
-* [Setting up your local environment](./doc/contributing/pull-requests.md#setting-up-your-local-environment)
-* [The Process of Making Changes](./doc/contributing/pull-requests.md#the-process-of-making-changes)
-* [Reviewing Pull Requests](./doc/contributing/pull-requests.md#reviewing-pull-requests)
-* [Large Pull Requests](./doc/contributing/large-pull-requests.md)
-* [Notes](./doc/contributing/pull-requests.md#notes)
+* [依赖](./doc/contributing/pull-requests.md#dependencies)
+* [配置本地环境](./doc/contributing/pull-requests.md#setting-up-your-local-environment)
+* [进行修改的流程](./doc/contributing/pull-requests.md#the-process-of-making-changes)
+* [评审 Pull Request](./doc/contributing/pull-requests.md#reviewing-pull-requests)
+* [大型 Pull Request](./doc/contributing/large-pull-requests.md)
+* [注意事项](./doc/contributing/pull-requests.md#notes)
 
-## Automation and bots
+## 自动化与机器人
 
-An automation tool or bot that is not managed by the Node.js project
-must seek explicit authorization by opening an issue with their owner
-in [nodejs/admin](https://github.com/nodejs/admin) before interacting
-with the project.
+非 Node.js 项目管理的自动化工具或机器人,在与本仓库交互之前,必须由其所有者在
+[nodejs/admin](https://github.com/nodejs/admin) 中发起 issue 并获得明确授权。
 
-Interactions (including Issues, Comments, Pull Requests and Reviews) made
-by an automation that was not authorized by Node.js collaborators are
-subject to immediate moderation enforcement on the automation and owner
-without notice.
+未经 Node.js 协作者授权的自动化行为(包括 Issue、评论、Pull Request 和 Review),
+其自动化账号及所有者可能被立即执行治理措施,且不会另行通知。
 
-## [AI Use Policy and Guidelines](./doc/contributing/ai-guidelines.md)
+## [AI 使用政策与准则](./doc/contributing/ai-guidelines.md)
 
-Node.js requires contributors to understand and take full responsibility for
-every change they propose. Pull requests containing AI-generated code the
-contributor has not personally understood, tested, and verified will likely be closed
-without review.
+Node.js 要求贡献者理解并对他们提出的每一处修改负全责。包含贡献者本人未曾理解、测试和验证过的 AI 生成代码的 pull request,很可能不经评审直接关闭。
 
-See [details on our AI use policy and guidelines](./doc/contributing/ai-guidelines.md).
+详见 [AI 使用政策与准则说明](./doc/contributing/ai-guidelines.md)。
 
-## Developer's Certificate of Origin 1.1
+## 开发者来源证明 1.1
 
 ```text
 By making a contribution to this project, I certify that:
