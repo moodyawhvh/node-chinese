@@ -1,84 +1,71 @@
-# Technical values and their priorities
+> 🌐 本文档由 [nodejs/node](https://github.com/nodejs/node) 翻译,英文原版见原项目。
 
-The project uses these technical values to establish priorities and guide
-collaboration.
+# 技术价值观及其优先级
 
-These are the shared values as of this writing and will
-evolve. We hope they are useful to people new
-to the project in order to better understand which contributions
-will be aligned with the current direction and as thinking
-points when trading off between conflicting goals.
+项目使用以下技术价值观来确立优先级并指导协作。
 
-The factors influencing every discussion/decision are
-different and priority 1 does not always trump priority 2
-and so on.
+这些是撰写本文时的共识价值观,并且会持续演进。我们希望它们能帮助新加入项目的人更好地理解哪些贡献与当前方向一致,并在相互冲突的目标之间做取舍时提供思考依据。
 
-## Values and priority level
+影响每一次讨论/决策的因素各不相同,优先级 1 并非总是压倒优先级 2,依此类推。
 
-* Priority 1 - Developer experience
-* Priority 2 - Stability
-* Priority 3 - Operational qualities
-* Priority 4 - Node.js maintainer experience
-* Priority 5 - Up to date technology and APIs
+## 价值观与优先级
 
-## Value descriptions
+* 优先级 1 - 开发者体验
+* 优先级 2 - 稳定性
+* 优先级 3 - 运行质量
+* 优先级 4 - Node.js 维护者体验
+* 优先级 5 - 技术与 API 的与时俱进
 
-### 1 - Developer experience
+## 价值观说明
 
-We value ensuring that developers are productive and enjoy developing
-with Node.js. Some key elements of this include:
+### 1 - 开发者体验
 
-* Approachability (both technical and community)
-* Great documentation
-* Bundling friction-reducing APIs and components, even though
-  they could be provided externally
-* Compatibility and interoperability with browsers and other JavaScript
-  environments so that as much code as possible runs as is both in Node.js and
-  in the other environments
-* Enabling/supporting external packages to ensure overall developer experience
+我们重视保障开发者的生产力,并让开发者享受用 Node.js 开发的过程。其中的一些关键要素包括:
 
-### 2 - Stability
+* 易于上手(技术层面和社区层面皆是)
+* 优秀的文档
+* 内置降低使用摩擦的 API 与组件,即使它们本可以由外部提供
+* 与浏览器及其他 JavaScript 环境保持兼容与互操作,让尽可能多的代码在 Node.js 和其他环境中原样运行
+* 支持外部包,以保障整体开发者体验
 
-Whenever possible, we seek to ensure that working code continues to work. To
-keep the trust of developers and users, we value stability.
-Some key elements of this include:
+### 2 - 稳定性
 
-* Backward compatibility
-* Stable releases on a predictable schedule
-* A strong safety net, including testing how changes
-  in Node.js affect popular packages
-* Careful consideration of what goes into Long Term Support (LTS) releases
+只要有可能,我们就力求让可正常工作的代码持续正常工作。为了赢得并保持开发者与用户的信任,我们重视稳定性。
+其中的一些关键要素包括:
 
-### 3 - Operational qualities
+* 向后兼容
+* 按可预期的节奏发布稳定版本
+* 强大的安全网,包括测试 Node.js 的变更对热门包的影响
+* 谨慎决定哪些内容进入长期支持(LTS)版本
 
-We value keeping Node.js safe, performant, and lightweight.
-We value enabling the ability to investigate and debug problems in
-development and production. Some key elements of this include:
+### 3 - 运行质量
 
-* High throughput (speed)
-* Fast startup
-* Small binary size
-* Small memory footprint
-* High-quality debugging tools
-* Robust diagnostic tools (profilers, etc.)
-* Responsible security practices
+我们重视让 Node.js 保持安全、高性能且轻量。
+我们重视支持在开发和生产环境中调查与调试问题。其中的一些关键要素包括:
 
-### 4 - Node.js maintainer experience
+* 高吞吐(速度)
+* 快速启动
+* 二进制体积小
+* 内存占用小
+* 高质量的调试工具
+* 健壮的诊断工具(性能分析器等)
+* 负责任的安全实践
 
-We value the productivity and happiness of the Node.js maintainers.
-Some key elements of this include:
+### 4 - Node.js 维护者体验
 
-* Approachability of the codebase
-* Good internal documentation and guides
-* Low-friction policies and processes
-* Good CI and tooling to make maintainers productive
+我们重视 Node.js 维护者的生产力与幸福感。
+其中的一些关键要素包括:
 
-### 5 - Up to date technology and APIs
+* 代码库易于上手
+* 完善的内部文档与指南
+* 低摩擦的政策与流程
+* 良好的 CI 和工具链,让维护者保持高效
 
-We value providing developers with modern APIs and technologies
-following existing standards whenever possible.
-Some key elements of this include:
+### 5 - 技术与 API 的与时俱进
 
-* Participating in standards work and organizations
-* Web API compatibility
-* Supporting and exposing new technologies and standards through early adoption
+我们重视尽可能遵循既有标准,为开发者提供现代的 API 与技术。
+其中的一些关键要素包括:
+
+* 参与标准制定工作与标准化组织
+* Web API 兼容性
+* 通过早期采用来支持和暴露新技术与新标准
